@@ -18,7 +18,7 @@
 
 
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
-
+require_once( 'modules/constants.inc.php' );
 
 class KompromatEP extends Table
 {
@@ -220,6 +220,43 @@ class KompromatEP extends Table
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
+
+    function stAwardMission()
+    {
+        // Handle award mission
+    }
+
+    function stFailedMission()
+    {
+        // Handle failed mission
+    }
+
+    function stFinalScoring()
+    {
+        // Handle final scoring
+    }
+
+    /*
+        Init a multiplayer active state
+    */
+    function stMultiPlayerInit() {
+        $this->gamestate->setAllPlayersMultiactive();
+    }
+
+    function stNextPlayer()
+    {
+        // Handle player change
+    }
+
+    function stNextRound()
+    {
+        // Handle end of round
+    }
+
+    function stRevealCards()
+    {
+        // Handle reveal cards
+    }
     
     /*
     

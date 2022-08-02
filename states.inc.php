@@ -52,52 +52,136 @@
  
 $machinestates = array(
 
-    // The initial state. Please do not modify.
-    1 => array(
+    /**
+     * INITIAL STATE
+     * 
+     * DO NOT MODIFY!
+     */
+    GAME_SETUP => array(
         "name" => "gameSetup",
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array( "" => 2 )
+        "transitions" => array( "" => PLAYER_TURN_FIRST_CARD )
     ),
     
-    // Note: ID=2 => your first state
+    /**
+     * Player decides which mission to play the first face up card to.
+     */
+    PLAYER_TURN_FIRST_CARD => array(
+    	"name" => "playerTurnFirstCard",
+    	"description" => clienttranslate('${actplayer} must select a mission to play card to.'),
+    	"descriptionmyturn" => clienttranslate('${you} must select a mission to play card to.'),
+    	"type" => "activeplayer",
+    	"possibleactions" => array( SELECT_MISSION ),
+    	"transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION )
+    ),
 
-    2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must play a card or pass'),
-    		"descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array( "playCard", "pass" ),
-    		"transitions" => array( "playCard" => 2, "pass" => 2 )
-    ),
-    
-/*
-    Examples:
-    
-    2 => array(
-        "name" => "nextPlayer",
-        "description" => '',
-        "type" => "game",
-        "action" => "stNextPlayer",
-        "updateGameProgression" => true,   
-        "transitions" => array( "endGame" => 99, "nextPlayer" => 10 )
-    ),
-    
-    10 => array(
-        "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+    /**
+     * Player decides to keep drawing cards for mission or stop.
+     */
+    PLAYER_TURN_CONTINUE_MISSION => array(
+        "name" => "playerTurnContinueMission",
+        "description" => clienttranslate('${actplayer} may draw another card or pass.'),
+        "descriptionmyturn" => clienttranslate('${you} may draw another card or pass.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "playCard", "pass" ),
-        "transitions" => array( "playCard" => 2, "pass" => 2 )
-    ), 
+        "possibleactions" => array( DRAW_CARD, STOP_DRAWING ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "nextPlayer" => NEXT_PLAYER )
+    ),
 
-*/    
+    /**
+     * Make next player active for turn or move to reveal step.
+     */
+    NEXT_PLAYER => array(
+        "name" => "nextPlayer",
+        "type" => "game",
+        "action" => "stGameNextPlayer",
+        "updateGameProgression" => true,
+        "transitions" => array( "nextTurn" => PLAYER_TURN_FIRST_CARD, "useItems" => USE_ITEMS )
+    ),
+
+    /**
+     * Use items before or after revealing cards.
+     */
+    USE_ITEMS => array(
+        "name" => "useItems",
+        "description" => clienttranslate('Waiting for other player to use items or pass.'),
+        "descriptionmyturn" => clienttranslate('${you} may use items or pass.'),
+        "type" => "multipleactiveplayer",
+        "possibleactions" => array( USE_ITEM, STOP_USING_ITEMS ),
+        "transitions" => array( "revealCards" => REVEAL_CARDS, "failedMission" => FAILED_MISSION ),
+        "action" => "stMultiPlayerInit"
+    ),
+
+    /**
+     * Reveal cards on next mission to resolve.
+     */
+    REVEAL_CARDS => array(
+        "name" => "revealCards",
+        "type" => "game",
+        "action" => "stRevealCards",
+        "transitions" => array( "useItems" => USE_ITEMS )
+    ),
+
+    /**
+     * Players with failed missions gain notoriety
+     */
+    FAILED_MISSION => array(
+        "name" => "failedMission",
+        "type" => "game",
+        "action" => "stFailedMission",
+        "transitions" => array( "perfectMission" => PERFECT_MISSION )
+    ),
+
+    /**
+     * Players with perfect missions can discard one notoriety.
+     */
+    PERFECT_MISSION => array(
+        "name" => "perfectMission",
+        "description" => clienttranslate('Waiting for other player to discard notoriety or pass.'),
+        "descriptionmyturn" => clienttranslate('You may discard one notoriety or pass.'),
+        "type" => "multipleactiveplayer",
+        "possibleactions" => array( DISCARD_NOTORIETY, KEEP_NOTORIETY ),
+        "transitions" => array( "awardMission" => AWARD_MISSION ),
+        "action" => "stMultiPlayerInit"
+    ),
+
+    /**
+     * Award mission to winning player.
+     */
+    AWARD_MISSION => array(
+        "name" => "awardMission",
+        "type" => "game",
+        "action" => "stAwardMission",
+        "transitions" => array( "revealCards" => REVEAL_CARDS, "nextRound" => NEXT_ROUND )
+    ),
+
+    /**
+     * Advance to next round or final scoring.
+     */
+    NEXT_ROUND => array(
+        "name" => "nextRound",
+        "type" => "game",
+        "action" => "stNextRound",
+        "transitions" => array( "nextRound" => PLAYER_TURN_FIRST_CARD, "finalScoring" => FINAL_SCORING )
+    ),
+
+    /**
+     * Perform final scoring.
+     */
+    FINAL_SCORING => array(
+        "name" => "finalScoring",
+        "type" => "game",
+        "action" => "stFinalScoring",
+        "transitions" => array( "gameEnd" => END_GAME )
+    ),
    
-    // Final state.
-    // Please do not modify (and do not overload action/args methods).
-    99 => array(
+    /**
+     * FINAL STATE
+     * 
+     * DO NOT MODIFY!
+     */
+    END_GAME => array(
         "name" => "gameEnd",
         "description" => clienttranslate("End of game"),
         "type" => "manager",

@@ -54,6 +54,7 @@ html {
 
 #page-title, div.player-board {
     background-color: #ffffff !important;
+    border-radius: 8px 8px 8px 8px !important;
     border-color: #000000 !important;
     border-style: dashed;
     border-width: 3px;
