@@ -253,6 +253,15 @@ class KompromatEP extends Table
         // Handle end of round
     }
 
+    /**
+     * Initialize private state for player turn.
+     */
+    function stPlayerTurn()
+    {
+        $this->gamestate->setPlayersMultiactive([$this->getActivePlayerId()], "");
+        $this->gamestate->initializePrivateState($this->getActivePlayerId());
+    }
+
     function stRevealCards()
     {
         // Handle reveal cards

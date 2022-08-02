@@ -48,7 +48,6 @@
 */
 
 //    !! It is not a good idea to modify this file when a game is running !!
-
  
 $machinestates = array(
 
@@ -62,7 +61,17 @@ $machinestates = array(
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array( "" => PLAYER_TURN_FIRST_CARD )
+        "transitions" => array( "" => PLAYER_TURN )
+    ),
+
+    PLAYER_TURN => array(
+        "name" => "playerTurn",
+        "description" => clienttranslate('Waiting for other player to finish turn.'),
+        "descriptionmyturn" => clienttranslate('${you} must do your turn.'),
+        "type" => "multipleactiveplayer",
+        "initialprivate" => PLAYER_TURN_FIRST_CARD,
+        "action" => "stPlayerTurn",
+        "transitions" => array( "nextPlayer" => NEXT_PLAYER )
     ),
     
     /**
@@ -72,9 +81,9 @@ $machinestates = array(
     	"name" => "playerTurnFirstCard",
     	"description" => clienttranslate('${actplayer} must select a mission to play card to.'),
     	"descriptionmyturn" => clienttranslate('${you} must select a mission to play card to.'),
-    	"type" => "activeplayer",
-    	"possibleactions" => array( SELECT_MISSION ),
-    	"transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION )
+    	"type" => "private",
+    	"possibleactions" => array( SELECT_MISSION, USE_ITEM ),
+    	"transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useDrone" => USE_DRONE )
     ),
 
     /**
@@ -84,9 +93,17 @@ $machinestates = array(
         "name" => "playerTurnContinueMission",
         "description" => clienttranslate('${actplayer} may draw another card or pass.'),
         "descriptionmyturn" => clienttranslate('${you} may draw another card or pass.'),
-        "type" => "activeplayer",
-        "possibleactions" => array( DRAW_CARD, STOP_DRAWING ),
-        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "nextPlayer" => NEXT_PLAYER )
+        "type" => "private",
+        "possibleactions" => array( DRAW_CARD, USE_ITEM ),
+        "transitions" => array( 
+            "playCards" => PLAYER_TURN_CONTINUE_MISSION,
+            "nextPlayer" => NEXT_PLAYER,
+            "useDrone" => USE_DRONE,
+            "useJetpack" => USE_JETPACK,
+            "useNewspaper" => USE_NEWSPAPER,
+            "useStunGun" => USE_STUN_GUN,
+            "useUsbStick" => USE_USB_STICK,
+            "useVesperMartini" => USE_VESPER_MARTINI )
     ),
 
     /**
@@ -97,20 +114,116 @@ $machinestates = array(
         "type" => "game",
         "action" => "stGameNextPlayer",
         "updateGameProgression" => true,
-        "transitions" => array( "nextTurn" => PLAYER_TURN_FIRST_CARD, "useItems" => USE_ITEMS )
+        "transitions" => array( "nextTurn" => PLAYER_TURN_FIRST_CARD, "endTurns" => USE_ITEMS_PHASE )
     ),
 
     /**
-     * Use items before or after revealing cards.
+     * Use items phase before or after revealing cards.
      */
-    USE_ITEMS => array(
-        "name" => "useItems",
+    USE_ITEMS_PHASE => array(
+        "name" => "useItemsPhase",
         "description" => clienttranslate('Waiting for other player to use items or pass.'),
         "descriptionmyturn" => clienttranslate('${you} may use items or pass.'),
         "type" => "multipleactiveplayer",
-        "possibleactions" => array( USE_ITEM, STOP_USING_ITEMS ),
+        "initialprivate" => USE_ITEMS,
         "transitions" => array( "revealCards" => REVEAL_CARDS, "failedMission" => FAILED_MISSION ),
         "action" => "stMultiPlayerInit"
+    ),
+
+    /**
+     * Use items private state
+     */
+    USE_ITEMS => array(
+        "name" => "useItem",
+        "description" => clienttranslate('Waiting for other players to finish using items.'),
+        "descriptionmyturn" => clienttranslate('${you} may use an item or pass.'),
+        "type" => "private",
+        "possibleactions" => array( USE_ITEM, STOP_USING_ITEMS ),
+        "transitions" => array( 
+            "useDrone" => USE_DRONE,
+            "useJetpack" =>USE_JETPACK,
+            "useNewspaper" => USE_NEWSPAPER,
+            "useStunGun" => USE_STUN_GUN,
+            "useUsbStick" => USE_USB_STICK,
+            "useVesperMartini" => USE_VESPER_MARTINI )
+    ),
+
+    /**
+     * Use Drone item
+     */
+    USE_DRONE => array(
+        "name" => "useDrone",
+        "descriptionmyturn" => clienttranslate('${you} must select a mission to reveal all opponent\'s cards.'),
+        "type" => "private",
+        "possibleactions" => array( DRONE_SELECT_MISSION ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useItems" => USE_ITEMS )
+    ),
+
+    /**
+     * Use Jetpack item (step 1)
+     */
+    USE_JETPACK => array(
+        "name" => "useJetpack",
+        "descriptionmyturn" => clienttranslate('${you} must select a mission to move cards from.'),
+        "type" => "private",
+        "possibleactions" => array( JETPACK_SELECT_SOURCE ),
+        "transitions" => array( "selectDestination" => USE_JETPACK_DESTINATION )
+    ),
+
+    /**
+     * Use Jetpack item (step 2)
+     */
+    USE_JETPACK_DESTINATION => array(
+        "name" => "useJetpackDestination",
+        "descriptionmyturn" => clienttranslate('${you} must select a mission to move selected cards to.'),
+        "type" => "private",
+        "possibleactions" => array( JETPACK_SELECT_DESTINATION ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useItems" => USE_ITEMS )
+    ),
+
+    /**
+     * Use Newspaper item
+     */
+    USE_NEWSPAPER => array(
+        "name" => "useNewspaper",
+        "descriptionmyturn" => clienttranslate('${you} must assign Newspaper to unrevealed mission of opponent.'),
+        "type" => "private",
+        "possibleactions" => array( NEWSPAPER_SELECT_MISSION ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useItems" => USE_ITEMS )
+
+    ),
+
+    /**
+     * Use Stun Gun item
+     */
+    USE_STUN_GUN => array(
+        "name" => "useStunGun",
+        "descriptionmyturn" => clienttranslate('${you} must select a face-down card to discard.'),
+        "type" => "private",
+        "possibleactions" => array( STUN_GUN_SELECT_CARD ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useItems" => USE_ITEMS )
+    ),
+
+    /**
+     * Use USB Stick item
+     */
+    USE_USB_STICK => array(
+        "name" => "useUsbStick",
+        "descriptionmyturn" => clienttranslate('${you} must select an item to re-use.'),
+        "type" => "private",
+        "possibleactions" => array( USE_ITEM ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useItems" => USE_ITEMS )
+    ),
+
+    /**
+     * Use Vesper Martini item
+     */
+    USE_VESPER_MARTINI => array(
+        "name" => "useVesperMartini",
+        "descriptionmyturn" => clienttranslate('${you} must adjust your total by +1 or -1.'),
+        "type" => "private",
+        "possibleactions" => array( VESPER_MARTINI_ADJUST_TOTAL ),
+        "transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useItems" => USE_ITEMS )
     ),
 
     /**
@@ -120,7 +233,7 @@ $machinestates = array(
         "name" => "revealCards",
         "type" => "game",
         "action" => "stRevealCards",
-        "transitions" => array( "useItems" => USE_ITEMS )
+        "transitions" => array( "useItems" => USE_ITEMS_PHASE )
     ),
 
     /**
@@ -142,8 +255,17 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('You may discard one notoriety or pass.'),
         "type" => "multipleactiveplayer",
         "possibleactions" => array( DISCARD_NOTORIETY, KEEP_NOTORIETY ),
-        "transitions" => array( "awardMission" => AWARD_MISSION ),
+        "transitions" => array( "checkChloroform" => CHECK_CHLOROFORM ),
         "action" => "stMultiPlayerInit"
+    ),
+
+    CHECK_CHLOROFORM => array(
+        "name" => "checkChloroform",
+        "description" => clienttranslate('Waiting for other player to use Chloroform or not.'),
+        "descriptionmyturn" => clienttranslate('${you} can use Choloroform to ignore Counter-Intelligence.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "useChloroform", "skipChloroform" ),
+        "transitions" => array( "awardMission" => AWARD_MISSION )
     ),
 
     /**
