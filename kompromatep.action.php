@@ -39,29 +39,203 @@
       }
   	} 
   	
-  	// TODO: defines your action entry points there
-
-
-    /*
-    
-    Example:
-  	
-    public function myAction()
+  	/**
+     * Discard 1 notoriety.
+     */
+    public function discardNotoriety()
     {
-        self::setAjaxMode();     
+      self::setAjaxMode();
 
-        // Retrieve arguments
-        // Note: these arguments correspond to what has been sent through the javascript "ajaxcall" method
-        $arg1 = self::getArg( "myArgument1", AT_posint, true );
-        $arg2 = self::getArg( "myArgument2", AT_posint, true );
+      $this->game->discardNotoriety();
 
-        // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
-        $this->game->myAction( $arg1, $arg2 );
-
-        self::ajaxResponse( );
+      self::ajaxResponse();
     }
-    
-    */
+
+    /**
+     * Draw 1 card for current mission.
+     */
+    public function drawCard()
+    {
+      self::setAjaxMode();
+
+      $this->game->drawCard();
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Select mission to use drone on.
+     */
+    public function droneSelectMission()
+    {
+      self::setAjaxMode();
+
+      $mission_slot = self::getArg( "missionSlot", AT_posint, true );
+
+      $this->game->droneSelectMission( $mission_slot );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Select destination mission to use jetpack on.
+     */
+    public function jetpackSelectDestination()
+    {
+      self::setAjaxMode();
+
+      $mission_slot = self::getArg( "missionSlot", AT_posint, true );
+
+      $this->game->jetpackSelectDestination( $mission_slot );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Select source mission to use jetpack on.
+     */
+    public function jetpackSelectSource()
+    {
+      self::setAjaxMode();
+
+      $mission_slot = self::getArg( "missionSlot", AT_posint, true );
+
+      $this->game->jetpackSelectSource( $mission_slot );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Keep notoriety.
+     */
+    public function keepNotoriety()
+    {
+      self::setAjaxMode();
+
+      $this->game->keepNotoriety();
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Select mission to use newspaper on.
+     */
+    public function newspaperSelectMission()
+    {
+      self::setAjaxMode();
+
+      $mission_slot = self::getArg( "missionSlot", AT_posint, true );
+
+      $this->game->newspaperSelectMission( $mission_slot );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Select Mission to play face-up card.
+     */
+    public function selectMission()
+    {
+      self::setAjaxMode();
+
+      $card_id = self::getArg( "cardId", AT_posint, true );
+      $mission_slot = self::getArg( "missionSlot", AT_posint, true );
+
+      $this->game->selectMission( $card_id, $mission_slot );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Skip using chloroform.
+     */
+    public function skipChloroform()
+    {
+      self::setAjaxMode();
+
+      $this->game->skipChloroform();
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Stop drawing card for current mission.
+     */
+    public function stopDrawing()
+    {
+      self::setAjaxMode();
+
+      $this->game->stopDrawing();
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Stop using items.
+     */
+    public function stopUsingItems()
+    {
+      self::setAjaxMode();
+
+      $this->game->stopUsingItems();
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Select card to use stun gun on.
+     */
+    public function stunGunSelectCard()
+    {
+      self::setAjaxMode();
+
+      $card_id = self::getArg( "cardId", AT_posint, true );
+
+      $this->game->stunGunSelectCard( $card_id );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Use chloroform.
+     */
+    public function useChloroform()
+    {
+      self::setAjaxMode();
+
+      $this->game->useChloroform();
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Use item.
+     */
+    public function useItem()
+    {
+      self::setAjaxMode();
+
+      $card_id = self::getArg( "cardId", AT_posint, true );
+
+      $this->game->useItem( $card_id );
+
+      self::ajaxResponse();
+    }
+
+    /**
+     * Use vesper martini to adjust value of mission by 1
+     */
+    public function vesperMartiniAdjustTotal()
+    {
+      self::setAjaxMode();
+
+      $mission_slot = self::getArg( "missionSlot", AT_posint, true );
+      $modifier = self::getArg( "modifier", AT_int, true );
+
+      $this->game->vesperMartiniAdjustTotal( $mission_slot, $modifier );
+
+      self::ajaxResponse();
+    }
 
   }
   

@@ -47,6 +47,9 @@ function (dojo, declare) {
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
+
+            // Import constants from PHP
+            this.defineGlobalConstants( gamedatas.constants );
             
             // Setting up player boards
             for( var player_id in gamedatas.players )
@@ -151,62 +154,296 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Utility methods
         
-        /*
-        
-            Here, you can defines some utility methods that you can use everywhere in your javascript
-            script.
-        
-        */
+        /**
+         * Give JavaScript access to constants used in PHP.
+         * 
+         * @param userConstants a list of constants defined in 'constants.inc.php'
+         */
+        defineGlobalConstants: function( userConstants )
+        {
+            for ( var constant in userConstants )
+            {
+                if ( !globalThis[constant] )
+                {
+                    globalThis[constant] = userConstants[constant];
+                }
+            }
+        },
 
+        /**
+         * Get URL for an action.
+         * 
+         * @param actionName The name of the action.
+         * @returns The ajax URL of the action.
+         */
+        getActionUrl: function( actionName )
+        {
+            return '/' + this.game_name + '/' + this.game_name + '/' + actionName + '.html';
+        },
+
+        /**
+         * Trigger a player action.
+         * 
+         * @param actionName The name of the action to trigger.
+         * @param args Args required by the action.
+         */
+        triggerPlayerAction: function( actionName, args )
+        {
+            // Check if action is possible in current state
+            if ( !this.checkAction( actionName ) )
+            {
+                console.log( actionName + ' action is not possible at the moment.')
+                return;
+            }
+
+            // Add lock = true to args
+            if ( !args ) 
+            {
+                args = [];
+            }
+            args.lock = true;
+
+            console.log( 'Triggering ' + actionName + ' action with args: ' + JSON.stringify(args) );
+
+            this.ajaxcall( this.getActionUrl( actionName ), args, this, function( result )
+                {
+                    console.log( 'Successful call to: ' + actionName );
+                }, function( error )
+                {
+                    if( error )
+                    {
+                        console.log( 'Error calling: ' + actionName );
+                    }
+                }
+            );
+        },
 
         ///////////////////////////////////////////////////
         //// Player's action
         
-        /*
-        
-            Here, you are defining methods to handle player's action (ex: results of mouse click on 
-            game objects).
-            
-            Most of the time, these methods:
-            _ check the action is possible at this game state.
-            _ make a call to the game server
-        
-        */
-        
-        /* Example:
-        
-        onMyMethodToCall1: function( evt )
+        /**
+         * Discard one notoriety
+         * 
+         * @param event an onDiscardNotoriety event 
+         */
+        onDiscardNotoriety: function( event )
         {
-            console.log( 'onMyMethodToCall1' );
-            
-            // Preventing default browser reaction
-            dojo.stopEvent( evt );
+            console.log( 'Calling onDiscardNotoriety with event: ' + event );
 
-            // Check that this action is possible (see "possibleactions" in states.inc.php)
-            if( ! this.checkAction( 'myAction' ) )
-            {   return; }
+            // dojo.stopEvent( event );
 
-            this.ajaxcall( "/kompromatep/kompromatep/myAction.html", { 
-                                                                    lock: true, 
-                                                                    myArgument1: arg1, 
-                                                                    myArgument2: arg2,
-                                                                    ...
-                                                                 }, 
-                         this, function( result ) {
-                            
-                            // What to do after the server call if it succeeded
-                            // (most of the time: nothing)
-                            
-                         }, function( is_error) {
+            this.triggerPlayerAction( DISCARD_NOTORIETY );
+        },
 
-                            // What to do after the server call in anyway (success or failure)
-                            // (most of the time: nothing)
+        /**
+         * Draw one card for current mission
+         * 
+         * @param event an onDrawCard event 
+         */
+        onDrawCard: function( event ) 
+        {
+            console.log( 'Calling onDrawCard with event: ' + event );
 
-                         } );        
-        },        
-        
-        */
+            // dojo.stopEvent( event );
 
+            this.triggerPlayerAction( DRAW_CARD );
+        },
+
+        /**
+         * Select mission to use drone on
+         * 
+         * @param event an onDroneSelectMission event 
+         */
+        onDroneSelectMission: function( event )
+        {
+            console.log( 'Calling onDroneSelectMission with event: ' + event );
+
+            // dojo.stopEvent( event );
+
+            var missionSlot = 1; // Get from event later
+
+            this.triggerPlayerAction( DRONE_SELECT_MISSION, {missionSlot: missionSlot} );
+        },
+
+        /**
+         * Select destination mission to use jetpack on
+         * 
+         * @param event an onJetpackSelectDestination event 
+         */
+        onJetpackSelectDestination: function( event )
+        {
+            console.log( 'Calling onJetpackSelectDestination with event: ' + event );
+
+            // dojo.stopEvent( event );
+
+            var missionSlot = 1; // Get from event later
+
+            this.triggerPlayerAction( JETPACK_SELECT_DESTINATION, {missionSlot: missionSlot} );
+        },
+
+        /**
+         * Select source mission to use jetpack on
+         * 
+         * @param event an onJetpackSelectSource event 
+         */
+        onJetpackSelectDestination: function( event )
+        {
+            console.log( 'Calling onJetpackSelectSource with event: ' + event );
+ 
+            // dojo.stopEvent( event );
+ 
+            var missionSlot = 1; // Get from event later
+ 
+            this.triggerPlayerAction( JETPACK_SELECT_SOURCE, {missionSlot: missionSlot} );
+        },
+
+        /**
+         * Keep notoriety
+         * 
+         * @param event an onKeepNotoriety event 
+         */
+        onKeepNotoriety: function( event )
+        {
+            console.log( 'Calling onKeepNotoriety with event: ' + event );
+ 
+            // dojo.stopEvent( event );
+ 
+            this.triggerPlayerAction( KEEP_NOTORIETY );
+        },
+
+        /**
+         * Select mission to use newspaper on
+         * 
+         * @param event an onNewspaperSelectMission event 
+         */
+        onNewspaperSelectMission: function( event )
+        {
+            console.log( 'Calling onNewspaperSelectMission with event: ' + event );
+ 
+            // dojo.stopEvent( event );
+ 
+            var missionSlot = 1; // Get from event later
+ 
+            this.triggerPlayerAction( NEWSPAPER_SELECT_MISSION, {missionSlot: missionSlot} );
+        },
+
+        /**
+         * Select a mission to play face-up card
+         * 
+         * @param event an onSelectMission event 
+         */
+        onSelectMission: function( event )
+        {
+            console.log( 'Calling onSelectMission with event: ' + event );
+
+            // dojo.stopEvent( event );
+
+            var cardId = 1; // Get from event later
+            var missionSlot = 1; // Get from event later
+
+            this.triggerPlayerAction( SELECT_MISSION, {cardId: cardId, missionSlot: missionSlot} );
+        },
+
+        /**
+         * Skip using chloroform
+         * 
+         * @param event an onSkipChloroform event 
+         */
+        onSkipChloroform: function( event ) 
+        {
+            console.log( 'Calling onSkipChloroform with event: ' + event );
+ 
+            // dojo.stopEvent( event );
+ 
+            this.triggerPlayerAction( SKIP_CHLOROFORM );
+        },
+
+        /**
+         * Stop drawing cards for current mission
+         * 
+         * @param event an onStopDrawing event 
+         */
+        onStopDrawing: function( event )
+        {
+            console.log( 'Calling onStopDrawing with event: ' + event );
+ 
+            this.triggerPlayerAction( STOP_DRAWING );
+        },
+
+         /**
+         * Stop using items
+         * 
+         * @param event an onStopUsingItems event 
+         */
+        onStopUsingItems: function( event )
+        {
+            console.log( 'Calling onStopUsingItems with event: ' + event );
+  
+            this.triggerPlayerAction( STOP_USING_ITEMS );
+        },
+
+        /**
+         * Select card to use stun gun on
+         * 
+         * @param event an onStunGunSelectCard event 
+         */
+        onStunGunSelectCard: function( event )
+        {
+            console.log( 'Calling onStunGunSelectCard with event: ' + event );
+  
+            // dojo.stopEvent( event );
+  
+            var cardId = 1; // Get from event later
+  
+            this.triggerPlayerAction( STUN_GUN_SELECT_CARD, {cardId: cardId} );
+        },
+
+        /**
+         * Use chloroform
+         * 
+         * @param event an onUseChloroform event 
+         */
+        onUseChloroform: function( event ) 
+        {
+            console.log( 'Calling onUseChloroform with event: ' + event );
+  
+            // dojo.stopEvent( event );
+  
+            this.triggerPlayerAction( USE_CHLOROFORM );
+        },
+
+        /**
+         * Use an item
+         * 
+         * @param event an onUseItem event 
+         */
+        onUseItem: function( event )
+        {
+            console.log( 'Calling onUseItem with event: ' + event );
+
+            // dojo.stopEvent( event );
+
+            var cardId = 1; // Get from event later
+
+            this.triggerPlayerAction( USE_ITEM, {cardId: cardId} );
+        },
+
+        /**
+         * Use vesper martini to adjust value of mission by 1
+         * 
+         * @param event an onVesperMartiniAdjustTotal event 
+         */
+        onVesperMartiniAdjustTotalseItem: function( event )
+        {
+            console.log( 'Calling onVesperMartiniAdjustTotal with event: ' + event );
+ 
+            // dojo.stopEvent( event );
+ 
+            var missionSlot = 1; // Get from event later
+            var modifier = 1; // Get from event later
+ 
+            this.triggerPlayerAction( VESPER_MARTINI_ADJUST_TOTAL, {missionSlot: missionSlot, modifier: modifier} );
+         },
         
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications

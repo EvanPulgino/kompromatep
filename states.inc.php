@@ -64,6 +64,9 @@ $machinestates = array(
         "transitions" => array( "" => PLAYER_TURN )
     ),
 
+    /**
+     * Use a multiple active player state for player turns to handle using item state changes
+     */
     PLAYER_TURN => array(
         "name" => "playerTurn",
         "description" => clienttranslate('Waiting for other player to finish turn.'),
@@ -83,7 +86,16 @@ $machinestates = array(
     	"descriptionmyturn" => clienttranslate('${you} must select a mission to play card to.'),
     	"type" => "private",
     	"possibleactions" => array( SELECT_MISSION, USE_ITEM ),
-    	"transitions" => array( "playCards" => PLAYER_TURN_CONTINUE_MISSION, "useDrone" => USE_DRONE )
+    	"transitions" => array( 
+            "playCards" => PLAYER_TURN_CONTINUE_MISSION,
+            "nextPlayer" => NEXT_PLAYER,
+            "useDrone" => USE_DRONE,
+            "useJetpack" => USE_JETPACK,
+            "useNewspaper" => USE_NEWSPAPER,
+            "useStunGun" => USE_STUN_GUN,
+            "useUsbStick" => USE_USB_STICK,
+            "useVesperMartini" => USE_VESPER_MARTINI
+        )
     ),
 
     /**
@@ -94,7 +106,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} may draw another card or pass.'),
         "descriptionmyturn" => clienttranslate('${you} may draw another card or pass.'),
         "type" => "private",
-        "possibleactions" => array( DRAW_CARD, USE_ITEM ),
+        "possibleactions" => array( DRAW_CARD, STOP_DRAWING, USE_ITEM ),
         "transitions" => array( 
             "playCards" => PLAYER_TURN_CONTINUE_MISSION,
             "nextPlayer" => NEXT_PLAYER,
@@ -103,7 +115,8 @@ $machinestates = array(
             "useNewspaper" => USE_NEWSPAPER,
             "useStunGun" => USE_STUN_GUN,
             "useUsbStick" => USE_USB_STICK,
-            "useVesperMartini" => USE_VESPER_MARTINI )
+            "useVesperMartini" => USE_VESPER_MARTINI
+        )
     ),
 
     /**
@@ -145,7 +158,8 @@ $machinestates = array(
             "useNewspaper" => USE_NEWSPAPER,
             "useStunGun" => USE_STUN_GUN,
             "useUsbStick" => USE_USB_STICK,
-            "useVesperMartini" => USE_VESPER_MARTINI )
+            "useVesperMartini" => USE_VESPER_MARTINI
+        )
     ),
 
     /**
@@ -259,12 +273,15 @@ $machinestates = array(
         "action" => "stMultiPlayerInit"
     ),
 
+    /**
+     * If a player has chloroform they can decide to use it to ignore counter-intelligence.
+     */
     CHECK_CHLOROFORM => array(
         "name" => "checkChloroform",
         "description" => clienttranslate('Waiting for other player to use Chloroform or not.'),
         "descriptionmyturn" => clienttranslate('${you} can use Choloroform to ignore Counter-Intelligence.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "useChloroform", "skipChloroform" ),
+        "possibleactions" => array( USE_CHLOROFORM, SKIP_CHLOROFORM ),
         "transitions" => array( "awardMission" => AWARD_MISSION )
     ),
 

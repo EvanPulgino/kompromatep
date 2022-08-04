@@ -108,6 +108,9 @@ class KompromatEP extends Table
     protected function getAllDatas()
     {
         $result = array();
+
+        // Get constants for use in JavaScript
+        $result['constants'] = get_defined_constants(true)['user'];
     
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
     
@@ -153,37 +156,125 @@ class KompromatEP extends Table
 //////////// Player actions
 //////////// 
 
-    /*
-        Each time a player is doing some game action, one of the methods below is called.
-        (note: each method below must match an input method in kompromatep.action.php)
-    */
-
-    /*
-    
-    Example:
-
-    function playCard( $card_id )
+    /**
+     * Discard 1 notoriety
+     */
+    function discardNotoriety()
     {
-        // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
-        self::checkAction( 'playCard' ); 
-        
-        $player_id = self::getActivePlayerId();
-        
-        // Add your game logic to play a card there 
-        ...
-        
-        // Notify all players about the card played
-        self::notifyAllPlayers( "cardPlayed", clienttranslate( '${player_name} plays ${card_name}' ), array(
-            'player_id' => $player_id,
-            'player_name' => self::getActivePlayerName(),
-            'card_name' => $card_name,
-            'card_id' => $card_id
-        ) );
-          
+        // Handle discard notoriety
     }
-    
-    */
 
+    /**
+     * Draw 1 card for current mission
+     */
+    function drawCard()
+    {
+        // Handle card draw
+    }
+
+    /**
+     * Select mission to use drone on
+     */
+    function droneSelectMission( $mission_slot )
+    {
+        // Handle drone select mission
+    }
+
+    /**
+     * Select destination mission for jetpack
+     */
+    function jetpackSelectDestination( $mission_slot )
+    {
+        // Handle jetpack destination
+    }
+
+    /**
+     * Select source mission for jetpack
+     */
+    function jetpackSelectSource( $mission_slot )
+    {
+        // Handle jetpack source
+    }
+
+    /**
+     * Keep notoriety
+     */
+    function keepNotoriety()
+    {
+        // Handle keep notoriety
+    }
+
+    /**
+     * Select mission to use newspaper on
+     */
+    function newspaperSelectMission( $mission_slot )
+    {
+        // Handle newspaper mission select
+    }
+
+    /**
+     * Select a mission to play face-up card
+     */
+    function selectMission( $card_id, $mission_slot )
+    {
+        // Handle select mission
+    }
+
+    /**
+     * Skip using chloroform
+     */
+    function skipChloroform()
+    {
+        // Hanlde skip chloroform
+    }
+
+    /**
+     * Stop drawing cards for current mission
+     */
+    function stopDrawing()
+    {
+        // Handle stop drawing cards
+    }
+
+    /**
+     * Stop using items
+     */
+    function stopUsingItems()
+    {
+        // Handle stop using items.
+    }
+
+    /**
+     * Select card to use stun gun on
+     */
+    function stunGunSelectCard( $card_id )
+    {
+        // Handle stun gun select card
+    }
+
+    /**
+     * Use chloroform
+     */
+    function useChloroform()
+    {
+        // Handle using chloroform
+    }
+
+    /**
+     * Use an item
+     */
+    function useItem( $card_id )
+    {
+        // Handle using an item
+    }
+
+    /**
+     * Use vesper martini to adjust value of mission by 1
+     */
+    function vesperMartiniAdjustTotal( $mission_slot, $modifier )
+    {
+        // Hanlde vesper martini
+    }
     
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state arguments
@@ -215,11 +306,6 @@ class KompromatEP extends Table
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state actions
 ////////////
-
-    /*
-        Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
-        The action method of state X is called everytime the current game state is set to X.
-    */
 
     function stAwardMission()
     {
@@ -266,19 +352,6 @@ class KompromatEP extends Table
     {
         // Handle reveal cards
     }
-    
-    /*
-    
-    Example for game state "MyGameState":
-
-    function stMyGameState()
-    {
-        // Do some stuff ...
-        
-        // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
-    }    
-    */
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Zombie

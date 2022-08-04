@@ -25,9 +25,11 @@
   define('KEEP_NOTORIETY', 'keepNotoriety');
   define('NEWSPAPER_SELECT_MISSION', 'newspaperSelectMission');
   define('SELECT_MISSION', 'selectMission');
+  define('SKIP_CHLOROFORM', 'skipChloroform');
   define('STOP_DRAWING', 'stopDrawing');
   define('STOP_USING_ITEMS', 'stopUsingItems');
   define('STUN_GUN_SELECT_CARD', 'stunGunSelectCard');
+  define('USE_CHLOROFORM', 'useChloroform');
   define('USE_ITEM', 'useItem');
   define('VESPER_MARTINI_ADJUST_TOTAL', 'vesperMartiniAdjustTotal');
 
