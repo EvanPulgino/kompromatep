@@ -32,7 +32,8 @@ class KompromatEP extends Table
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels( array( 
+        self::initGameStateLabels( array(
+            "mission_slot_to_resolve" => 10
             //    "my_first_global_variable" => 10,
             //    "my_second_global_variable" => 11,
             //      ...
@@ -80,14 +81,18 @@ class KompromatEP extends Table
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
+        self::setGameStateInitialValue( 'mission_slot_to_resolve', 1 );
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // TODO: setup the initial game situation here
+        // 1. Shuffle equipment decks
+
+        // 2. Shuffle mission deck
+
+        // 4. Reveal top 4 cards
        
 
         // Activate first player (which is in general a good idea :) )

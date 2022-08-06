@@ -33,11 +33,60 @@
     }    
   	function build_page( $viewArgs )
   	{		
+        // Template name
+        $template = self::getGameName().'_'.self::getGameName();
+
   	    // Get players & players number
         $players = $this->game->loadPlayersBasicInfos();
         $players_nbr = count( $players );
 
-        /*********** Place your code below:  ************/
+        $order = 1;
+
+        $this->page->begin_block( $template, 'playerarea' );
+
+        $this->page->begin_block( $template, 'playermissionslot' );
+        $this->page->begin_block( $template, 'playermission' );
+
+        foreach( $players as $player )
+        {
+          $this->page->reset_subblocks('playermissionslot');
+
+          $this->page->insert_block( "playerarea", array(
+            'PLAYER_ID' => $player['player_id'],
+            'PLAYER_NAME' => $player['player_name'],
+            'PLAYER_COLOR' => $player['player_color'],
+            'ORDER' => $order
+          ) );
+
+          for( $slot_number = 1; $slot_number <= 4; $slot_number++ )
+          {
+            $this->page->insert_block( "playermissionslot", array(
+              'PLAYER_ID' => $player['player_id'],
+              'PLAYER_NAME' => $player['player_name'],
+              'PLAYER_COLOR' => $player['player_color'],
+              'SLOT_NUMBER' => $slot_number
+            ) );
+          }
+
+          $this->page->insert_block( "playermission", array(
+            'PLAYER_ID' => $player['player_id'],
+            'PLAYER_NAME' => $player['player_name'],
+            'PLAYER_COLOR' => $player['player_color'],
+            'ORDER' => $order
+          ) );
+
+          if( $order == 1 ) {
+            $order = 3;
+          }
+        }
+
+        $this->page->begin_block( $template, 'missionslot' );
+
+        for( $slot_number = 1; $slot_number <= 4; $slot_number++ )
+        {
+          $this->page->insert_block( "missionslot", array( 'SLOT_NUMBER' => $slot_number ) );
+        }
+
 
 
         /*

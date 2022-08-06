@@ -48,14 +48,75 @@
 
 /********* You can start writing your CSS below this line: **********/
 
+/***** GLOBAL STYLING *****/
+
 html {
     background-image:url('img/komp_background.png');
 }
 
 #page-title, div.player-board {
     background-color: #ffffff !important;
-    border-radius: 8px 8px 8px 8px !important;
+    border-radius: 8px !important;
     border-color: #000000 !important;
     border-style: dashed;
     border-width: 3px;
+}
+
+/***** GENERIC STYLING *****/
+
+.komp-clickable {
+    cursor: pointer;
+}
+
+.komp-highlight {
+    border: 5px solid orangered;
+    border-radius: 8px;
+    border-style: inset;
+}
+
+
+/***** GAME LAYOUT *****/
+
+#komp_layout {
+    padding-top: 10px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.komp-player-area {
+    width: 20vw;
+    height: 85vh;
+    border-radius: 15px !important;
+    border-color: #000000 !important;
+    border-style: dashed;
+    border-width: 5px;
+}
+
+#komp_mission_area {
+    width: 45vw;
+    height: 85vh;
+    order: 2;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.komp-mission-column {
+    order: 2;
+    display: grid;
+    gap: 1rem;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-items: center;
+}
+
+.komp-mission-column-element {
+    width: 100px;
+    height: 100px;
 }

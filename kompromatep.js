@@ -79,22 +79,26 @@ function (dojo, declare) {
         {
             console.log( 'Entering state: '+stateName );
             
+            // Clear temp styles and disconnect handlers
+            this.removeAllTemporaryStyles();
+            this.disconnectAll();
+
             switch( stateName )
             {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
-                break;
-           */
-           
-           
-            case 'dummmy':
-                break;
+                case 'playerTurnFirstCard':
+                    if( this.isCurrentPlayerActive() )
+                    {
+                        for( let slotNumber = 1; slotNumber <= 4; slotNumber++ )
+                        {
+                            this.makeElementInteractive( 'komp_mission_slot_' + slotNumber );
+                            dojo.query( '#komp_mission_slot_' + slotNumber ).connect( 'onclick', this, 'onSelectMission' );
+                        }
+                    }
+
+                    break;         
+
+                case 'dummmy':
+                    break;
             }
         },
 
@@ -179,6 +183,25 @@ function (dojo, declare) {
         getActionUrl: function( actionName )
         {
             return '/' + this.game_name + '/' + this.game_name + '/' + actionName + '.html';
+        },
+
+        /**
+         * Add CSS styling to make an element interactive.
+         * 
+         * @param {*} elementId 
+         */
+        makeElementInteractive: function( elementId )
+        {
+            dojo.addClass( elementId, [ 'komp-clickable', 'komp-highlight' ] );
+        },
+
+        /**
+         * Remove all styles potentially added for temporary states.
+         */
+        removeAllTemporaryStyles: function() 
+        {
+            dojo.query('.komp-clickable').removeClass('komp-clicable');
+            dojo.query('.komp-highlight').removeClass('komp-highlight');
         },
 
         /**
@@ -336,10 +359,10 @@ function (dojo, declare) {
         {
             console.log( 'Calling onSelectMission with event: ' + event );
 
-            // dojo.stopEvent( event );
+            dojo.stopEvent( event );
 
             var cardId = 1; // Get from event later
-            var missionSlot = 1; // Get from event later
+            var missionSlot = event.target.id.split("_")[3];
 
             this.triggerPlayerAction( SELECT_MISSION, {cardId: cardId, missionSlot: missionSlot} );
         },
