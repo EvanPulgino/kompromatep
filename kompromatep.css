@@ -163,6 +163,12 @@ html {
     z-index: -1;
 }
 
+.komp-card-on-deck {
+    position: absolute !important;
+    z-index: -1;
+    bottom: 5%;
+}
+
 .komp-card-yellow-ace {
     background-position: 0 0;
 }

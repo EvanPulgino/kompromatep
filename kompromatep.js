@@ -65,6 +65,8 @@ function (dojo, declare) {
         {
             console.log( "Starting game setup" );
 
+            console.log(gamedatas);
+
             // Import constants from PHP
             this.defineGlobalConstants( gamedatas.constants );
 
@@ -76,10 +78,9 @@ function (dojo, declare) {
             {
                 var player = gamedatas.players[player_id];
                 var playerColor = this.getPlayerColorAsString( player.color );
-                console.log(playerColor);
                 
                 // Create facedown deck
-                for( var i = 0; i <= 5; i++ )
+                for( var i = 0; i <= 4; i++ )
                 {
                     dojo.place(
                         this.format_block(
@@ -92,6 +93,25 @@ function (dojo, declare) {
                         ),
                         'komp_player_deck_' + player_id
                     );
+                }
+
+                if( gamedatas.card_on_deck[playerColor] )
+                {
+                    var card = gamedatas.card_on_deck[playerColor];
+                    var cardType = this.cardTypes[card.type_arg];
+
+                    // Create card on deck
+                    dojo.place(
+                        this.format_block(
+                            'jstpl_card',
+                            {
+                                card_id: card.id,
+                                card_class: cardType.class
+                            }
+                        ),
+                        'komp_player_deck_' + player_id
+                    );
+                    dojo.addClass( 'komp_card_' + card.id, 'komp-card-on-deck')
                 }
             }
 

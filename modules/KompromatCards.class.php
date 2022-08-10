@@ -66,6 +66,32 @@ class KompromatCards extends APP_GameClass
         self::revealNewMissions();
     }
 
+    public function drawPlayerCardFaceupOnDeck( $color )
+    {
+        $this->cards->pickCardForLocation( $color.'_deck', $color.'_on_deck' );
+    }
+
+    /**
+     * Get all cards in mission slots
+     */
+    public function getCardsInMissionSlots()
+    {
+        return $this->cards->getCardsInLocation( 'mission_slot' );
+    }
+
+    function getCardOnDeck( $color )
+    {
+        return $this->cards->getCardOnTop( $color."_on_deck" );
+    }
+
+    /**
+     * Count remaining cards in a deck
+     */
+    public function getDeckCount( $deck_type )
+    {
+        return $this->cards->countCardInLocation( $deck_type.'_deck' );
+    }
+
     /**
      * Fill mission slots with new cards
      */
@@ -93,16 +119,6 @@ class KompromatCards extends APP_GameClass
         // Return cards in holding area to deck and reshuffle
         $this->cards->moveAllCardsInLocation( 'holding_area', 'mission_deck' );
         $this->cards->shuffle( 'mission_deck' );
-    }
-
-    public function getCardsInMissionSlots()
-    {
-        return $this->cards->getCardsInLocation( 'mission_slot' );
-    }
-
-    public function getMissionDeckCount()
-    {
-        return $this->cards->countCardInLocation( 'mission_deck' );
     }
 
     /**

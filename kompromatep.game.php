@@ -91,6 +91,9 @@ class KompromatEP extends Table
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
+        // Put player's first card on deck
+        $this->cards->drawPlayerCardFaceupOnDeck( self::getActivePlayerColor() );
+
         /************ End of the game initialization *****/
     }
 
@@ -119,7 +122,15 @@ class KompromatEP extends Table
         // Get information from material
         $result['card_type'] = $this->card_type;
 
-        $result['mission_deck_count'] = $this->cards->getMissionDeckCount();
+        // Get counts of each deck
+        $result['blue_deck_count'] = $this->cards->getDeckCount( 'blue' );
+        $result['mission_deck_count'] = $this->cards->getDeckCount( 'mission' );
+        $result['yellow_deck_count'] = $this->cards->getDeckCount( 'yellow' );
+
+        // Get cards on deck
+        $result['card_on_deck']['blue'] = $this->cards->getCardOnDeck( 'blue' );
+        $result['card_on_deck']['yellow'] = $this->cards->getCardOnDeck( 'yellow' );
+
         $result['missions'] = $this->cards->getCardsInMissionSlots();
   
         return $result;
@@ -147,11 +158,47 @@ class KompromatEP extends Table
 //////////// Utility functions
 ////////////    
 
-    /*
-        In this space, you can put any utility methods useful for your game logic
-    */
+    /**
+     * Get string value of active player color
+     */
+    function getActivePlayerColor()
+    {
+        $active_player_id = $this->getActivePlayerId();
+        return self::getPlayerColor( $active_player_id );
+    }
 
+    /**
+     * Get string value from hex color
+     */
+    function getColorStringFromHex( $hex_color )
+    {
+        if( $hex_color == '0077bf' )
+        {
+            return 'blue';
+        }
+        else
+        {
+            return 'yellow';
+        }
+    }
 
+    /**
+     * Get string value of player color
+     */
+    function getPlayerColor( $player_id )
+    {
+        $player = self::getPlayerInfo( $player_id );
+        $hex_color = $player['color'];
+        return self::getColorStringFromHex( $hex_color );
+    }
+
+    /**
+     * Get player info from  DB
+     */
+    function getPlayerInfo( $player_id )
+    {
+        return self::getObjectFromDB( "SELECT player_id id, player_name name, player_color color, player_score score, player_notoriety notoriety FROM player WHERE player_id=$player_id" );
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
