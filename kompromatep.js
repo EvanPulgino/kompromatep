@@ -18,17 +18,34 @@
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
-    "ebg/counter"
+    "ebg/counter",
+    "ebg/zone"
 ],
 function (dojo, declare) {
     return declare("bgagame.kompromatep", ebg.core.gamegui, {
         constructor: function(){
             console.log('kompromatep constructor');
-              
-            // Here, you can init the global variables of your user interface
-            // Example:
-            // this.myGlobalValue = 0;
 
+            // Card size
+            this.cardWidth = 135;
+            this.cardHeight = 205.2;
+
+            // Content from material
+            this.cardTypes = null;
+
+            // Counterintel slot zones
+            this.counterintelSlots = {};
+            this.counterintelSlots[1] = new ebg.zone();
+            this.counterintelSlots[2] = new ebg.zone();
+            this.counterintelSlots[3] = new ebg.zone();
+            this.counterintelSlots[4] = new ebg.zone();
+              
+            // Mission slot zones
+            this.missionSlots = {};
+            this.missionSlots[1] = new ebg.zone();
+            this.missionSlots[2] = new ebg.zone();
+            this.missionSlots[3] = new ebg.zone();
+            this.missionSlots[4] = new ebg.zone();
         },
         
         /*
@@ -50,6 +67,9 @@ function (dojo, declare) {
 
             // Import constants from PHP
             this.defineGlobalConstants( gamedatas.constants );
+
+            // Populate material variables
+            this.cardTypes = gamedatas.card_type;
             
             // Setting up player boards
             for( var player_id in gamedatas.players )
@@ -58,8 +78,64 @@ function (dojo, declare) {
                          
                 // TODO: Setting up players boards if needed
             }
+
+            // Add more facedown cards to simulate deck size
+            for( var i = 0; i <= gamedatas.mission_deck_count; i++ )
+            {
+                dojo.place(
+                    this.format_block(
+                        'jstpl_mission_card_back',
+                        {
+                            num: i
+                        }
+                    ),
+                    'komp_mission_deck'
+                );
+            }
+
             
-            // TODO: Set up your game interface here, according to "gamedatas"
+            // Set up counterintel and mission slots
+            for( var i = 1; i <= 4; i++ )
+            {
+                // Build counterinter slot. Invert width and height gor horizontal card
+                var counterintelSlotDivId = 'komp_counterintel_slot_' + i;
+                this.counterintelSlots[i].create( this, counterintelSlotDivId, this.cardHeight, this.cardHeight );
+
+                // Build mission slot
+                var missionSlotDivId = 'komp_mission_slot_' + i;
+                this.missionSlots[i].create( this, missionSlotDivId, this.cardWidth, this.cardHeight );
+            }
+
+            for( var card_id in gamedatas.missions )
+            {
+
+                var card = gamedatas.missions[card_id];
+                var cardType = this.cardTypes[card.type_arg];
+
+                // Create card on deck
+                dojo.place(
+                    this.format_block(
+                        'jstpl_card',
+                        {
+                            card_id: card.id,
+                            card_class: cardType.class
+                        }
+                    ),
+                    'komp_mission_deck'
+                );
+
+                if( card.type == COUNTERINTELLIGENCE )
+                {
+                    // Place in counterintel zone
+                    this.counterintelSlots[card.location_arg].placeInZone( 'komp_card_' + card.id );
+                    dojo.addClass( 'komp_card_' + card.id, 'komp-rotate-right' );
+                }
+                else
+                {
+                    // Place in mission zone
+                    this.missionSlots[card.location_arg].placeInZone( 'komp_card_' + card.id );
+                }
+            }
             
  
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -88,11 +164,11 @@ function (dojo, declare) {
                 case 'playerTurnFirstCard':
                     if( this.isCurrentPlayerActive() )
                     {
-                        for( let slotNumber = 1; slotNumber <= 4; slotNumber++ )
-                        {
-                            this.makeElementInteractive( 'komp_mission_slot_' + slotNumber );
-                            dojo.query( '#komp_mission_slot_' + slotNumber ).connect( 'onclick', this, 'onSelectMission' );
-                        }
+                        // for( let slotNumber = 1; slotNumber <= 4; slotNumber++ )
+                        // {
+                        //     this.makeElementInteractive( 'komp_mission_slot_' + slotNumber );
+                        //     dojo.query( '#komp_mission_slot_' + slotNumber ).connect( 'onclick', this, 'onSelectMission' );
+                        // }
                     }
 
                     break;         

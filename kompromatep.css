@@ -70,8 +70,12 @@ html {
 
 .komp-highlight {
     border: 5px solid orangered;
-    border-radius: 8px;
+    border-radius: 15px;
     border-style: inset;
+}
+
+.komp-rotate-right {
+    transform: rotate(90deg);
 }
 
 
@@ -87,8 +91,8 @@ html {
 }
 
 .komp-player-area {
-    width: 20vw;
-    height: 85vh;
+    width: auto;
+    height: auto;
     border-radius: 15px !important;
     border-color: #000000 !important;
     border-style: dashed;
@@ -96,8 +100,8 @@ html {
 }
 
 #komp_mission_area {
-    width: 45vw;
-    height: 85vh;
+    width: auto;
+    height: auto;
     order: 2;
     display: flex;
     flex-flow: row nowrap;
@@ -117,6 +121,234 @@ html {
 }
 
 .komp-mission-column-element {
-    width: 100px;
-    height: 100px;
+    width: 135px;
+    height: 205.2px;
+}
+
+.komp-mission-column-slot {
+    position: relative;
+    width: 250px;
+    height: 216px;
+}
+
+.komp-mission-column-card {
+    position: absolute;
+    top: 0;
+}
+
+.komp-counterintel-slot {
+    left: 50px;
+}
+
+.komp-mission-slot {
+    left: 25px;
+    width: 135px;
+}
+
+/***** CARDS *****/
+.komp-card {
+    display: inline-block;
+    position: relative;
+    width: 135px;
+    height: 205.2px;
+    border-radius: 10px;
+    background-image: url('img/komp_cards.png');
+    box-shadow: 5px 5px 5px 0 #000000a0;
+}
+
+.komp-stack {
+    position: absolute !important;
+    z-index: -1;
+}
+
+.komp-card-yellow-ace {
+    background-position: 0 0;
+}
+
+.komp-card-yellow-ten {
+    background-position: 11.11% 0;
+}
+
+.komp-card-yellow-nine {
+    background-position: 22.22% 0;
+}
+
+.komp-card-yellow-eight {
+    background-position: 33.33% 0;
+}
+
+.komp-card-yellow-three {
+    background-position: 44.44% 0;
+}
+
+.komp-card-blue-seven {
+    background-position: 55.55% 0;
+}
+
+.komp-card-blue-four {
+    background-position: 66.66% 0;
+}
+
+.komp-card-balaclava {
+    background-position: 77.77% 0;
+}
+
+.komp-card-locker {
+    background-position: 88.88% 0;
+}
+
+.komp-card-yellow-back {
+    background-position: 100% 0;
+}
+
+.komp-card-yellow-seven {
+    background-position: 0 25%;
+}
+
+.komp-card-yellow-six {
+    background-position: 11.11% 25%;
+}
+
+.komp-card-yellow-five {
+    background-position: 22.22% 25%;
+}
+
+.komp-card-yellow-four {
+    background-position: 33.33% 25%;
+}
+
+.komp-card-yellow-two {
+    background-position: 44.44% 25%;
+}
+
+.komp-card-blue-six {
+    background-position: 55.55% 25%;
+}
+
+.komp-card-blue-three {
+    background-position: 66.66% 25%;
+}
+
+.komp-card-jetpack {
+    background-position: 77.77% 25%;
+}
+
+.komp-card-interrogation {
+    background-position: 88.88% 25%;
+}
+
+.komp-card-blue-back {
+    background-position: 100% 25%;
+}
+
+.komp-card-yellow-half {
+    background-position: 0 50%;
+}
+
+.komp-card-blue-ace {
+    background-position: 11.11% 50%;
+}
+
+.komp-card-blue-ten {
+    background-position: 22.22% 50%;
+}
+
+.komp-card-blue-nine {
+    background-position: 33.33% 50%;
+}
+
+.komp-card-blue-eight {
+    background-position: 44.44% 50%;
+}
+
+.komp-card-blue-five {
+    background-position: 55.55% 50%;
+}
+
+.komp-card-blue-two {
+    background-position: 66.66% 50%;
+}
+
+.komp-card-gps-tracker {
+    background-position: 77.77% 50%;
+}
+
+.komp-card-pursuit {
+    background-position: 88.88% 50%;
+}
+
+.komp-card-mission-back {
+    background-position: 100% 50%;
+}
+
+.komp-card-blue-half {
+    background-position: 0 75%;
+}
+
+.komp-card-code {
+    background-position: 11.11% 75%;
+}
+
+.komp-card-document {
+    background-position: 22.22% 75%;
+}
+
+.komp-card-counterintelligence-three {
+    background-position: 33.33% 75%;
+}
+
+.komp-card-counterintelligence-two {
+    background-position: 44.44% 75%;
+}
+
+.komp-card-counterintelligence-one {
+    background-position: 55.55% 75%;
+}
+
+.komp-card-newspaper {
+    background-position: 66.66% 75%;
+}
+
+.komp-card-chloroform {
+    background-position: 77.77% 75%;
+}
+
+.komp-card-safe-house {
+    background-position: 88.88% 75%;
+}
+
+.komp-card-stun-gun {
+    background-position: 0 100%;
+}
+
+.komp-card-drone {
+    background-position: 11.11% 100%;
+}
+
+.komp-card-usb-stick {
+    background-position: 22.22% 100%;
+}
+
+.komp-card-vesper-martini {
+    background-position: 33.33% 100%;
+}
+
+.komp-card-night-vision {
+    background-position: 44.44% 100%;
+}
+
+.komp-card-hotel {
+    background-position: 55.55% 100%;
+}
+
+.komp-card-barmaid {
+    background-position: 66.66% 100%;
+}
+
+.komp-card-airport {
+    background-position: 77.77% 100%;
+}
+
+.komp-card-informant {
+    background-position: 88.88% 100%;
 }

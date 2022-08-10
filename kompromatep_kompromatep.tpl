@@ -31,9 +31,13 @@
         <!-- END playermission -->
 
         <div id="komp_mission_column" class="komp-mission-column">
-            <div id="komp_mission_deck" class="komp-mission-column-element">Mission Deck</div>
+            <div id="komp_mission_deck" class="komp-mission-column-slot">
+            </div>
             <!-- BEGIN missionslot -->
-            <div id="komp_mission_slot_{SLOT_NUMBER}" class="komp-mission-column-element">Mission #{SLOT_NUMBER}</div>
+            <div id="komp_mission_column_slot_{SLOT_NUMBER}" class="komp-mission-column-slot">
+                <div id="komp_counterintel_slot_{SLOT_NUMBER}" class="komp-mission-column-card komp-counterintel-slot"></div>
+                <div id="komp_mission_slot_{SLOT_NUMBER}" class="komp_mission-column_card komp-mission-slot"></div>
+            </div>
             <!-- END missionslot -->
         </div>
         
@@ -43,13 +47,8 @@
 
 <script type="text/javascript">
 
-// Javascript HTML templates
-
-/*
-// Example:
-var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
-
-*/
+    var jstpl_card = '<div id="komp_card_${card_id}" class="komp-card ${card_class}"></div>';
+    var jstpl_mission_card_back = '<div id="komp_mission_card_back_${num}" class="komp-card komp-card-mission-back komp-mission-slot komp-stack"></div>'
 
 </script>  
 

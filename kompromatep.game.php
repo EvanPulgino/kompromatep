@@ -19,6 +19,7 @@
 
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 require_once( 'modules/constants.inc.php' );
+require_once( 'modules/KompromatCards.class.php' );
 
 class KompromatEP extends Table
 {
@@ -34,13 +35,9 @@ class KompromatEP extends Table
         
         self::initGameStateLabels( array(
             "mission_slot_to_resolve" => 10
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
-        ) );        
+        ) );
+
+        $this->cards = new KompromatCards( $this );
 	}
 	
     protected function getGameName( )
@@ -88,13 +85,9 @@ class KompromatEP extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // 1. Shuffle equipment decks
-
-        // 2. Shuffle mission deck
-
-        // 4. Reveal top 4 cards
+        // Setup cards
+        $this->cards->setupNewGame( $players, $options );
        
-
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
@@ -120,11 +113,14 @@ class KompromatEP extends Table
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
     
         // Get information about players
-        // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_notoriety notoriety, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
-  
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
+
+        // Get information from material
+        $result['card_type'] = $this->card_type;
+
+        $result['mission_deck_count'] = $this->cards->getMissionDeckCount();
+        $result['missions'] = $this->cards->getCardsInMissionSlots();
   
         return $result;
     }
