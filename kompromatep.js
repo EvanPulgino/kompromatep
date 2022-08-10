@@ -75,12 +75,28 @@ function (dojo, declare) {
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-                         
-                // TODO: Setting up players boards if needed
+                var playerColor = this.getPlayerColorAsString( player.color );
+                console.log(playerColor);
+                
+                // Create facedown deck
+                for( var i = 0; i <= 5; i++ )
+                {
+                    dojo.place(
+                        this.format_block(
+                            'jstpl_player_card_back',
+                            {
+                                player_id: player_id,
+                                color: playerColor,
+                                num: i
+                            }
+                        ),
+                        'komp_player_deck_' + player_id
+                    );
+                }
             }
 
             // Add more facedown cards to simulate deck size
-            for( var i = 0; i <= gamedatas.mission_deck_count; i++ )
+            for( var i = 0; i <= 5; i++ )
             {
                 dojo.place(
                     this.format_block(
@@ -259,6 +275,24 @@ function (dojo, declare) {
         getActionUrl: function( actionName )
         {
             return '/' + this.game_name + '/' + this.game_name + '/' + actionName + '.html';
+        },
+
+        /**
+         * Converts player hex color into string for CSS use.
+         * 
+         * @param hexColor Player color in hex form
+         * @returns Player color in string form
+         */
+        getPlayerColorAsString: function( hexColor )
+        {
+            if( hexColor == '0077bf' )
+            {
+                return 'blue';
+            }
+            else
+            {
+                return 'yellow';
+            }
         },
 
         /**

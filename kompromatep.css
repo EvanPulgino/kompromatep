@@ -45,9 +45,6 @@
 
 /* Note: you must not use any @import directive */
 
-
-/********* You can start writing your CSS below this line: **********/
-
 /***** GLOBAL STYLING *****/
 
 html {
@@ -99,6 +96,11 @@ html {
     border-width: 5px;
 }
 
+.komp-player-deck {
+    width: 50%;
+    margin: 0 auto;
+}
+
 #komp_mission_area {
     width: auto;
     height: auto;
@@ -125,10 +127,10 @@ html {
     height: 205.2px;
 }
 
-.komp-mission-column-slot {
+.komp-column-slot {
     position: relative;
     width: 250px;
-    height: 216px;
+    height: 210px;
 }
 
 .komp-mission-column-card {
@@ -137,11 +139,11 @@ html {
 }
 
 .komp-counterintel-slot {
-    left: 50px;
+    left: 75px;
 }
 
 .komp-mission-slot {
-    left: 25px;
+    left: 52px;
     width: 135px;
 }
 
@@ -153,7 +155,7 @@ html {
     height: 205.2px;
     border-radius: 10px;
     background-image: url('img/komp_cards.png');
-    box-shadow: 5px 5px 5px 0 #000000a0;
+    box-shadow: 1px 1px 1px 0 #000000a0;
 }
 
 .komp-stack {
