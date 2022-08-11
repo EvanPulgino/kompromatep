@@ -46,6 +46,19 @@ function (dojo, declare) {
             this.missionSlots[2] = new ebg.zone();
             this.missionSlots[3] = new ebg.zone();
             this.missionSlots[4] = new ebg.zone();
+
+            // Player slot zones
+            this.playerSlots = {};
+            this.playerSlots['blue'] = {};
+            this.playerSlots['blue'][1] = new ebg.zone();
+            this.playerSlots['blue'][2] = new ebg.zone();
+            this.playerSlots['blue'][3] = new ebg.zone();
+            this.playerSlots['blue'][4] = new ebg.zone();
+            this.playerSlots['yellow'] = {};
+            this.playerSlots['yellow'][1] = new ebg.zone();
+            this.playerSlots['yellow'][2] = new ebg.zone();
+            this.playerSlots['yellow'][3] = new ebg.zone();
+            this.playerSlots['yellow'][4] = new ebg.zone();
         },
         
         /*
@@ -91,7 +104,7 @@ function (dojo, declare) {
                                 num: i
                             }
                         ),
-                        'komp_player_deck_' + player_id
+                        'komp_player_deck_' + playerColor
                     );
                 }
 
@@ -106,10 +119,11 @@ function (dojo, declare) {
                             'jstpl_card',
                             {
                                 card_id: card.id,
-                                card_class: cardType.class
+                                card_class: cardType.class,
+                                slot: 'ondeck'
                             }
                         ),
-                        'komp_player_deck_' + player_id
+                        'komp_player_deck_' + playerColor
                     );
                     dojo.addClass( 'komp_card_' + card.id, 'komp-card-on-deck')
                 }
@@ -140,6 +154,12 @@ function (dojo, declare) {
                 // Build mission slot
                 var missionSlotDivId = 'komp_mission_slot_' + i;
                 this.missionSlots[i].create( this, missionSlotDivId, this.cardWidth, this.cardHeight );
+
+                // Build player mission slots
+                var blueMissionDivId = 'komp_blue_player_mission_slot_' + i;
+                this.playerSlots['blue'][i].create( this, blueMissionDivId, this.cardHeight, this.cardWidth );
+                var yellowMissionDivId = 'komp_yellow_player_mission_slot_' + i;
+                this.playerSlots['yellow'][i].create( this, yellowMissionDivId, this.cardHeight, this.cardWidth );
             }
 
             for( var card_id in gamedatas.missions )
@@ -153,8 +173,9 @@ function (dojo, declare) {
                     this.format_block(
                         'jstpl_card',
                         {
-                            card_id: card.id,
-                            card_class: cardType.class
+                            card_id: card_id,
+                            card_class: cardType.class,
+                            slot: card.location_arg
                         }
                     ),
                     'komp_mission_deck'
@@ -169,10 +190,30 @@ function (dojo, declare) {
                 else
                 {
                     // Place in mission zone
-                    this.missionSlots[card.location_arg].placeInZone( 'komp_card_' + card.id );
+                    this.missionSlots[card.location_arg].placeInZone( 'komp_card_' + card_id );
                 }
             }
-            
+
+            for( var card_id in gamedatas.player_missions )
+            {
+                var card = gamedatas.player_missions[card_id];
+                var cardType = this.cardTypes[card.type_arg];
+
+                // Create card on deck
+                dojo.place(
+                    this.format_block(
+                        'jstpl_card',
+                        {
+                            card_id: card_id,
+                            card_class: cardType.class,
+                            slot: card.type + '_' + card.location_arg
+                        }
+                    ),
+                    'komp_player_deck_' + card.type
+                );
+                this.playerSlots[card.type][card.location_arg].placeInZone( 'komp_card_' + card_id );
+                dojo.addClass( 'komp_card_' + card.id, 'komp-rotate-right' );
+            }
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -200,11 +241,15 @@ function (dojo, declare) {
                 case 'playerTurnFirstCard':
                     if( this.isCurrentPlayerActive() )
                     {
-                        // for( let slotNumber = 1; slotNumber <= 4; slotNumber++ )
-                        // {
-                        //     this.makeElementInteractive( 'komp_mission_slot_' + slotNumber );
-                        //     dojo.query( '#komp_mission_slot_' + slotNumber ).connect( 'onclick', this, 'onSelectMission' );
-                        // }
+                        var playerColor = this.getPlayerColor( this.getCurrentPlayerId );
+                        for( let slotNumber = 1; slotNumber <= 4; slotNumber++ )
+                        {
+                            if( this.playerSlots[playerColor][slotNumber].getItemNumber() == 0 )
+                            {
+                                this.makeElementInteractive( 'komp_mission_slot_' + slotNumber );
+                                this.connect( $('komp_mission_slot_' + slotNumber), 'onclick', 'onSelectMission' );
+                            }
+                        }
                     }
 
                     break;         
@@ -220,9 +265,18 @@ function (dojo, declare) {
         onLeavingState: function( stateName )
         {
             console.log( 'Leaving state: '+stateName );
+
+            // Clear temp styles and disconnect handlers
+            this.removeAllTemporaryStyles();
+            this.disconnectAll();
             
             switch( stateName )
             {
+                // case 'playerTurnFirstCard':
+                //     for( let slotNumber = 1; slotNumber <= 4; slotNumber++ )
+                //     {
+                //         dojo.query( '#komp_mission_slot_' + slotNumber ).disconnect
+                //     }
             
             /* Example:
             
@@ -297,6 +351,11 @@ function (dojo, declare) {
             return '/' + this.game_name + '/' + this.game_name + '/' + actionName + '.html';
         },
 
+        getPlayerColor: function( playerId )
+        {
+            return dojo.byId('komp_player_area_' + this.getCurrentPlayerId()).attributes.color.value;
+        },
+
         /**
          * Converts player hex color into string for CSS use.
          * 
@@ -330,7 +389,7 @@ function (dojo, declare) {
          */
         removeAllTemporaryStyles: function() 
         {
-            dojo.query('.komp-clickable').removeClass('komp-clicable');
+            dojo.query('.komp-clickable').removeClass('komp-clickable');
             dojo.query('.komp-highlight').removeClass('komp-highlight');
         },
 
@@ -473,7 +532,7 @@ function (dojo, declare) {
         {
             console.log( 'Calling onNewspaperSelectMission with event: ' + event );
  
-            // dojo.stopEvent( event );
+            dojo.stopEvent( event );
  
             var missionSlot = 1; // Get from event later
  
@@ -491,8 +550,10 @@ function (dojo, declare) {
 
             dojo.stopEvent( event );
 
-            var cardId = 1; // Get from event later
-            var missionSlot = event.target.id.split("_")[3];
+            var card = dojo.query("[slot=ondeck]")[0];
+
+            var cardId = card.id.replace('komp_card_', '');
+            var missionSlot = event.target.slot;
 
             this.triggerPlayerAction( SELECT_MISSION, {cardId: cardId, missionSlot: missionSlot} );
         },
@@ -613,35 +674,32 @@ function (dojo, declare) {
         setupNotifications: function()
         {
             console.log( 'notifications subscriptions setup' );
-            
-            // TODO: here, associate your game notifications with local methods
-            
-            // Example 1: standard notification handling
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            
-            // Example 2: standard notification handling + tell the user interface to wait
-            //            during 3 seconds after calling the method in order to let the players
-            //            see what is happening in the game.
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            // 
+
+            dojo.subscribe( 'startMission', this, 'notif_startMission' );
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
-        
-        /*
-        Example:
-        
-        notif_cardPlayed: function( notif )
+
+        notif_startMission: function( notif )
         {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
-            
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-            
-            // TODO: play the card in the user interface.
-        },    
-        
-        */
+            var playerColor = notif.args.color;
+            var cardId = notif.args.card_id;
+            var missionSlot = notif.args.mission_slot;
+
+            var rotation = 'komp-rotate-';
+            if( playerColor == 'blue' )
+            {
+                rotation += 'right';
+            }
+            else
+            {
+                rotation += 'left';
+            }
+
+            dojo.removeClass( 'komp_card_' + cardId, 'komp-card-on-deck' );
+            dojo.addClass( 'komp_card_' + cardId, rotation );
+            dojo.setAttr( 'komp_card_' + cardId, 'slot', playerColor + '_' + cardId );
+            this.playerSlots[playerColor][missionSlot].placeInZone( 'komp_card_' + cardId );
+        },
    });             
 });

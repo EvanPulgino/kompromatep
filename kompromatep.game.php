@@ -116,7 +116,7 @@ class KompromatEP extends Table
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
     
         // Get information about players
-        $sql = "SELECT player_id id, player_notoriety notoriety, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_color color, player_notoriety notoriety, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
 
         // Get information from material
@@ -131,7 +131,9 @@ class KompromatEP extends Table
         $result['card_on_deck']['blue'] = $this->cards->getCardOnDeck( 'blue' );
         $result['card_on_deck']['yellow'] = $this->cards->getCardOnDeck( 'yellow' );
 
+        // Get cards on missions
         $result['missions'] = $this->cards->getCardsInMissionSlots();
+        $result['player_missions'] = $this->cards->getPlayerCardsOnMission();
   
         return $result;
     }
@@ -265,7 +267,34 @@ class KompromatEP extends Table
      */
     function selectMission( $card_id, $mission_slot )
     {
-        // Handle select mission
+        $this->cards->assignCardToMission( $card_id, $mission_slot );
+
+        $mission_cards = $this->cards->getCardsInMissionSlot( $mission_slot );
+        $mission_card_id;
+
+        foreach( $mission_cards as $id => $card )
+        {
+            if( $card['type'] != COUNTERINTELLIGENCE )
+            {
+                $mission_card_id = $id;
+            }
+        }
+
+        $card_info = $this->cards->getCardInfoFromId( $mission_card_id );
+
+        self::notifyAllPlayers(
+            'startMission',
+            clienttranslate( '${player_name} starts mission for ${mission_name}' ),
+            array(
+                'player_name' => $this->getActivePlayerName(),
+                'mission_name' => strtoupper($card_info['name']),
+                'color' => self::getActivePlayerColor(),
+                'card_id' => $card_id,
+                'mission_slot' => $mission_slot
+            )
+        );
+
+        $this->gamestate->nextPrivateState( $this->getActivePlayerId(), "playCards" );
     }
 
     /**
@@ -333,6 +362,17 @@ class KompromatEP extends Table
         These methods function is to return some additional information that is specific to the current
         game state.
     */
+
+    function argsPlayerTurnFirstCard()
+    {
+        $player_color = self::getActivePlayerColor();
+        $current_card = $this->cards->getCardOnDeck( $player_color );
+        $card_info = $this->card_type[$current_card['type_arg']];
+
+        return array(
+            'card_name' => $card_info['name']
+        );
+    }
 
     /*
     

@@ -82,9 +82,10 @@ $machinestates = array(
      */
     PLAYER_TURN_FIRST_CARD => array(
     	"name" => "playerTurnFirstCard",
-    	"description" => clienttranslate('${actplayer} must select a mission to play card to.'),
-    	"descriptionmyturn" => clienttranslate('${you} must select a mission to play card to.'),
+    	"description" => clienttranslate('${actplayer} must start a mission with the ${card_name}'),
+    	"descriptionmyturn" => clienttranslate('${you} must start a mission with the ${card_name}'),
     	"type" => "private",
+        "args" => "argsPlayerTurnFirstCard",
     	"possibleactions" => array( SELECT_MISSION, USE_ITEM ),
     	"transitions" => array( 
             "playCards" => PLAYER_TURN_CONTINUE_MISSION,

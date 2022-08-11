@@ -66,9 +66,22 @@ class KompromatCards extends APP_GameClass
         self::revealNewMissions();
     }
 
+    public function assignCardToMission( $card_id, $mission_id )
+    {
+        $this->cards->moveCard( $card_id, 'player_mission', $mission_id );
+    }
+
     public function drawPlayerCardFaceupOnDeck( $color )
     {
         $this->cards->pickCardForLocation( $color.'_deck', $color.'_on_deck' );
+    }
+
+    /**
+     * Get all cards in mission slot
+     */
+    public function getCardsInMissionSlot( $slot )
+    {
+        return $this->cards->getCardsInLocation( 'mission_slot', $slot );
     }
 
     /**
@@ -77,6 +90,15 @@ class KompromatCards extends APP_GameClass
     public function getCardsInMissionSlots()
     {
         return $this->cards->getCardsInLocation( 'mission_slot' );
+    }
+
+    /**
+     * Get card info from DB id
+     */
+    public function getCardInfoFromId( $card_id )
+    {
+        $card = $this->cards->getCard( $card_id );
+        return $this->game->card_type[$card['type_arg']];
     }
 
     function getCardOnDeck( $color )
@@ -90,6 +112,11 @@ class KompromatCards extends APP_GameClass
     public function getDeckCount( $deck_type )
     {
         return $this->cards->countCardInLocation( $deck_type.'_deck' );
+    }
+
+    public function getPlayerCardsOnMission()
+    {
+        return $this->cards->getCardsInLocation( 'player_mission' );
     }
 
     /**

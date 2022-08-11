@@ -66,9 +66,13 @@ html {
 }
 
 .komp-highlight {
-    border: 5px solid orangered;
-    border-radius: 15px;
-    border-style: inset;
+    border: 3px solid orangered;
+    border-radius: 10px;
+    border-style: dashed;
+}
+
+.komp-rotate-left {
+    transform: rotate(-90deg);
 }
 
 .komp-rotate-right {
@@ -123,8 +127,7 @@ html {
 }
 
 .komp-mission-column-element {
-    width: 135px;
-    height: 205.2px;
+    height: 210px !important;
 }
 
 .komp-column-slot {

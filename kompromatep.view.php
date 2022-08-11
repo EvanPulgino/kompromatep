@@ -54,7 +54,7 @@
           $this->page->insert_block( "playerarea", array(
             'PLAYER_ID' => $player['player_id'],
             'PLAYER_NAME' => $player['player_name'],
-            'PLAYER_COLOR' => $player['player_color'],
+            'PLAYER_COLOR' => $this->game->getColorStringFromHex( $player['player_color'] ),
             'ORDER' => $order
           ) );
 
@@ -63,7 +63,7 @@
             $this->page->insert_block( "playermissionslot", array(
               'PLAYER_ID' => $player['player_id'],
               'PLAYER_NAME' => $player['player_name'],
-              'PLAYER_COLOR' => $player['player_color'],
+              'PLAYER_COLOR' => $this->game->getColorStringFromHex( $player['player_color'] ),
               'SLOT_NUMBER' => $slot_number
             ) );
           }

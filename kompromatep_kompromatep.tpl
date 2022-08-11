@@ -15,8 +15,8 @@
 
 <div id="komp_layout">
     <!-- BEGIN playerarea -->
-    <div id="komp_player_area_{PLAYER_ID}" class="komp-column-slot" style="order: {ORDER}">
-        <div id="komp_player_deck_{PLAYER_ID}" class="komp-player-deck"></div>
+    <div id="komp_player_area_{PLAYER_ID}" color="{PLAYER_COLOR}" class="komp-column-slot" style="order: {ORDER}">
+        <div id="komp_player_deck_{PLAYER_COLOR}" class="komp-player-deck"></div>
     </div>
     <!-- END playerarea -->
 
@@ -25,7 +25,7 @@
         <div id="komp_player_mission_column_{PLAYER_ID}" class="komp-mission-column" style="order: {ORDER}">
             <div id="komp_player_mission_empty_cell_{PLAYER_ID}" class="komp-mission-column-element"></div>
             <!-- BEGIN playermissionslot -->
-            <div id="komp_player_mission_slot_{SLOT_NUMBER}_{PLAYER_ID}" class="komp-mission-column-element">{PLAYER_NAME} SLOT #{SLOT_NUMBER}</div>
+            <div id="komp_{PLAYER_COLOR}_player_mission_slot_{SLOT_NUMBER}" class="komp-mission-column-element"></div>
             <!-- END playermissionslot -->
         </div>
         <!-- END playermission -->
@@ -46,7 +46,7 @@
 
 <script type="text/javascript">
 
-    var jstpl_card = '<div id="komp_card_${card_id}" class="komp-card ${card_class}"></div>';
+    var jstpl_card = '<div id="komp_card_${card_id}" class="komp-card ${card_class}" slot="${slot}"></div>';
     var jstpl_player_card_back = '<div id="komp_player_card_back_${num}_${player_id}" style="bottom: ${num}%" class="komp-card komp-card-${color}-back komp-stack"></div>';
     var jstpl_mission_card_back = '<div id="komp_mission_card_back_${num}" style="bottom: ${num}%" class="komp-card komp-card-mission-back komp-mission-slot komp-stack"></div>'
 
