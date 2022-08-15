@@ -56,19 +56,33 @@ html {
     border-radius: 8px !important;
     border-color: #000000 !important;
     border-style: dashed;
-    border-width: 3px;
+    border-width: 2px;
 }
 
 /***** GENERIC STYLING *****/
+
+.komp-button {
+    border: 2px outset black !important;
+    border-radius: 6px !important;
+    box-shadow: 1px 1px 1px 0 #000000a0 !important;
+}
 
 .komp-clickable {
     cursor: pointer;
 }
 
+.komp-hidden {
+    display: none !important;
+}
+
 .komp-highlight {
-    border: 3px solid orangered;
+    border: 2px solid orangered;
     border-radius: 10px;
     border-style: dashed;
+}
+
+.komp-important {
+    background: orangered !important;
 }
 
 .komp-rotate-left {
@@ -101,8 +115,9 @@ html {
 }
 
 .komp-player-deck {
-    width: 50%;
-    margin: 0 auto;
+    width: 137px;
+    height: 215px;
+    margin: -7px auto;
 }
 
 #komp_mission_area {
@@ -127,12 +142,13 @@ html {
 }
 
 .komp-mission-column-element {
+    position: relative;
     height: 210px !important;
 }
 
 .komp-column-slot {
     position: relative;
-    width: 250px;
+    width: 287px;
     height: 210px;
 }
 
@@ -148,6 +164,203 @@ html {
 .komp-mission-slot {
     left: 52px;
     width: 135px;
+}
+
+.komp-blue-1 {
+    position: absolute !important;
+    z-index: 1;
+    right: 0;
+    /* top: unset !important; */
+    left: unset !important;
+}
+
+.komp-blue-2 {
+    position: absolute !important;
+    z-index: 2;
+    right: 39px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-3 {
+    position: absolute !important;
+    z-index: 3;
+    right: 78px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-4 {
+    position: absolute !important;
+    z-index: 4;
+    right: 117px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-5 {
+    position: absolute !important;
+    z-index: 5;
+    right: 156px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-6 {
+    position: absolute !important;
+    z-index: 6;
+    right: 195px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-7 {
+    position: absolute !important;
+    z-index: 7;
+    right: 234px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-8 {
+    position: absolute !important;
+    z-index: 8;
+    right: 273px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-blue-9 {
+    position: absolute !important;
+    z-index: 9;
+    right: 312px;
+    top: unset !important;
+    left: unset !important;
+}
+
+.komp-yellow-1 {
+    position: absolute !important;
+    z-index: 1;
+    left: 0 !important;
+    top: unset !important;
+}
+
+.komp-yellow-2 {
+    position: absolute !important;
+    z-index: 2;
+    left: 39px !important;
+    top: unset !important;
+}
+
+.komp-yellow-3 {
+    position: absolute !important;
+    z-index: 3;
+    left: 78px !important;
+    /* top: unset !important; */
+}
+
+.komp-yellow-4 {
+    position: absolute !important;
+    z-index: 4;
+    left: 117px !important;
+    top: unset !important;
+}
+
+.komp-yellow-5 {
+    position: absolute !important;
+    z-index: 5;
+    left: 156px !important;
+    top: unset !important;
+}
+
+.komp-yellow-6 {
+    position: absolute !important;
+    z-index: 6;
+    left: 195px !important;
+    top: unset !important;
+}
+
+.komp-yellow-7 {
+    position: absolute !important;
+    z-index: 7;
+    left: 234px !important;
+    top: unset !important;
+}
+
+.komp-yellow-8 {
+    position: absolute !important;
+    z-index: 8;
+    left: 273px !important;
+    top: unset !important;
+}
+
+.komp-yellow-9 {
+    position: absolute !important;
+    z-index: 9;
+    left: 312px !important;
+    top: unset !important;
+}
+
+/***** COUNTERS *****/
+.komp-counter {
+    position: absolute;
+    font-size: large;
+    font-weight: bolder;
+    width: 40px;
+    height: 25px;
+    padding: 2.5px;
+    line-height: 25px;
+    text-align: center;
+    border-radius: 2px;
+    box-shadow: 3px 3px 3px 0 #000000a0;
+}
+
+.komp-blue-mission-total {
+    background-color: #53a2d4;
+    bottom: 90px;
+    right: 67%;
+    z-index: 1;
+    border-radius: 5px !important;
+}
+
+.komp-yellow-mission-total {
+    background-color: #ebc373;
+    bottom: 90px;
+    right: 34%;
+    z-index: 1;
+    border-radius: 5px !important;
+}
+
+.komp-ace-one {
+    bottom: 115px !important;
+}
+
+.komp-ace-one-one {
+    bottom: 130px !important;
+}
+
+.komp-ace-eleven {
+    bottom: 75px !important;
+}
+
+.komp-ace-eleven-eleven {
+    bottom: 50px !important;
+}
+
+.komp-mission-bust {
+    background-color: orangered !important;
+}
+
+.komp-mission-deck-counter {
+    background-color: #faf0e6;
+    bottom: 0;
+    right: 27%;
+}
+
+.komp-player-deck-counter {
+    background-color: #faf0e6;
+    bottom: 0;
+    right: 21%;
 }
 
 /***** CARDS *****/

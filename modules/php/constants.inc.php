@@ -17,6 +17,7 @@
   /**
    * Actions
    */
+  define('CHOOSE_MISSION', 'chooseMission');
   define('DISCARD_NOTORIETY', 'discardNotoriety');
   define('DRAW_CARD', 'drawCard');
   define('DRONE_SELECT_MISSION', 'droneSelectMission');
@@ -97,17 +98,25 @@
   define('YELLOW', 'yellow');
 
   /**
+   * Round End Phase
+   */
+  define('END_REVEAL', 1);
+  define('END_CHOOSE_ACES', 2);
+  define('END_FAILED', 3);
+
+  /**
    * States
    */
-  define('AWARD_MISSION', 44);
-  define('CHECK_CHLOROFORM', 43);
+  define('AWARD_MISSION', 45);
+  define('CHECK_CHLOROFORM', 44);
+  define('CHOOSE_ACES', 41);
   define('END_GAME', 99);
-  define('FAILED_MISSION', 41);
+  define('FAILED_MISSION', 42);
   define('FINAL_SCORING', 50);
   define('GAME_SETUP', 1);
   define('NEXT_PLAYER', 20);
   define('NEXT_ROUND', 50);
-  define('PERFECT_MISSION', 42);
+  define('PERFECT_MISSION', 43);
   define('PLAYER_TURN', 10);
   define('PLAYER_TURN_FIRST_CARD', 11);
   define('PLAYER_TURN_CONTINUE_MISSION', 12);

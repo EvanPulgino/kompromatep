@@ -66,14 +66,19 @@ class KompromatCards extends APP_GameClass
         self::revealNewMissions();
     }
 
-    public function assignCardToMission( $card_id, $mission_id )
+    public function assignCardToMission( $card_id, $player_color, $mission_id, $card_order )
     {
-        $this->cards->moveCard( $card_id, 'player_mission', $mission_id );
+        return $this->cards->moveCard( $card_id, $player_color.'_slot_'.$mission_id, $card_order );
     }
 
     public function drawPlayerCardFaceupOnDeck( $color )
     {
-        $this->cards->pickCardForLocation( $color.'_deck', $color.'_on_deck' );
+        return $this->cards->pickCardForLocation( $color.'_deck', $color.'_on_deck' );
+    }
+
+    public function drawPlayerCardForMission( $color, $mission_id, $card_order )
+    {
+        return $this->cards->pickCardForLocation( $color.'_deck', $color.'_slot_'.$mission_id, $card_order );
     }
 
     /**
@@ -93,9 +98,17 @@ class KompromatCards extends APP_GameClass
     }
 
     /**
-     * Get card info from DB id
+     * Get card record from DB id
      */
-    public function getCardInfoFromId( $card_id )
+    public function getCardFromId( $card_id )
+    {
+        return $this->cards->getCard( $card_id );
+    }
+
+    /**
+     * Get card type from DB id
+     */
+    public function getCardTypeFromId( $card_id )
     {
         $card = $this->cards->getCard( $card_id );
         return $this->game->card_type[$card['type_arg']];
@@ -114,9 +127,14 @@ class KompromatCards extends APP_GameClass
         return $this->cards->countCardInLocation( $deck_type.'_deck' );
     }
 
-    public function getPlayerCardsOnMission()
+    public function getPlayerMissionCount( $color, $mission_slot )
     {
-        return $this->cards->getCardsInLocation( 'player_mission' );
+        return $this->cards->countCardInLocation( $color.'_slot_'.$mission_slot);
+    }
+
+    public function getPlayerCardsOnMission( $color, $mission_slot )
+    {
+        return $this->cards->getCardsInLocation( $color.'_slot_'.$mission_slot );
     }
 
     /**

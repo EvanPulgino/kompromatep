@@ -18,8 +18,8 @@
 
 
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
-require_once( 'modules/constants.inc.php' );
-require_once( 'modules/KompromatCards.class.php' );
+require_once( 'modules/php/constants.inc.php' );
+require_once( 'modules/php/KompromatCards.class.php' );
 
 class KompromatEP extends Table
 {
@@ -34,7 +34,10 @@ class KompromatEP extends Table
         parent::__construct();
         
         self::initGameStateLabels( array(
-            "mission_slot_to_resolve" => 10
+            "current_mission" => 10,
+            "completed_mission_halves" => 11,
+            "mission_slot_to_resolve" => 12,
+            "end_round_phase" => 13
         ) );
 
         $this->cards = new KompromatCards( $this );
@@ -78,7 +81,10 @@ class KompromatEP extends Table
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        self::setGameStateInitialValue( 'mission_slot_to_resolve', 1 );
+        self::setGameStateInitialValue( 'current_mission', 0 );
+        self::setGameStateInitialValue( 'completed_mission_halves', 0 );
+        self::setGameStateInitialValue( 'mission_slot_to_resolve', 0 );
+        self::setGameStateInitialValue( 'end_round_phase', END_REVEAL );
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -90,9 +96,6 @@ class KompromatEP extends Table
        
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
-
-        // Put player's first card on deck
-        $this->cards->drawPlayerCardFaceupOnDeck( self::getActivePlayerColor() );
 
         /************ End of the game initialization *****/
     }
@@ -122,6 +125,10 @@ class KompromatEP extends Table
         // Get information from material
         $result['card_type'] = $this->card_type;
 
+        // Get current active mission
+        $result['current_mission'] = self::getGameStateValue( 'current_mission' );
+        $result['mission_slot_to_resolve'] = self::getGameStateValue( 'mission_slot_to_resolve' );
+
         // Get counts of each deck
         $result['blue_deck_count'] = $this->cards->getDeckCount( 'blue' );
         $result['mission_deck_count'] = $this->cards->getDeckCount( 'mission' );
@@ -133,7 +140,17 @@ class KompromatEP extends Table
 
         // Get cards on missions
         $result['missions'] = $this->cards->getCardsInMissionSlots();
-        $result['player_missions'] = $this->cards->getPlayerCardsOnMission();
+
+        // Get player cards on missions
+        foreach( $result['players'] as $player_id => $player )
+        {
+            $color = $this->getColorStringFromHex( $player['color'] );
+
+            for( $slot = 1; $slot <= 4; $slot++)
+            {
+                $result['mission_'.$slot][$color] = $this->cards->getPlayerCardsOnMission( $color, $slot );
+            }
+        }
   
         return $result;
     }
@@ -219,7 +236,39 @@ class KompromatEP extends Table
      */
     function drawCard()
     {
-        // Handle card draw
+        $player_id = self::getActivePlayerId();
+        $player_color = self::getActivePlayerColor();
+        $mission_slot = self::getGameStateValue( 'current_mission' );
+        $playerMissionCount = $this->cards->getPlayerMissionCount( $player_color, $mission_slot ) + 1;
+        $drawn_card = $this->cards->drawPlayerCardForMission( $player_color, $mission_slot, $playerMissionCount );
+
+        $mission_cards = $this->cards->getCardsInMissionSlot( $mission_slot );
+        $mission_card_id;
+
+        foreach( $mission_cards as $id => $card )
+        {
+            if( $card['type'] != COUNTERINTELLIGENCE )
+            {
+                $mission_card_id = $id;
+            }
+        }
+
+        $mission_card_type = $this->cards->getCardTypeFromId( $mission_card_id );
+        $drawn_card_type = $this->card_type[$drawn_card['type_arg']];
+
+        $this->notifyAllPlayers(
+            'drawCard',
+            clienttranslate( '${player_name} adds a card to ${mission_name}' ),
+            array(
+                'player_name' => $this->getActivePlayerName(),
+                'mission_name' => strtoupper($mission_card_type['name']),
+                'card' => $drawn_card,
+                'card_type' => $drawn_card_type,
+                'mission_slot' => $mission_slot
+            )
+        );
+
+        $this->gamestate->nextPrivateState( $this->getActivePlayerId(), "playCards" );
     }
 
     /**
@@ -267,7 +316,9 @@ class KompromatEP extends Table
      */
     function selectMission( $card_id, $mission_slot )
     {
-        $this->cards->assignCardToMission( $card_id, $mission_slot );
+        $this->cards->assignCardToMission( $card_id, $this->getActivePlayerColor(), $mission_slot, 1 );
+
+        self::setGameStateValue( 'current_mission', $mission_slot );
 
         $mission_cards = $this->cards->getCardsInMissionSlot( $mission_slot );
         $mission_card_id;
@@ -280,16 +331,18 @@ class KompromatEP extends Table
             }
         }
 
-        $card_info = $this->cards->getCardInfoFromId( $mission_card_id );
+        $mission_card_type = $this->cards->getCardTypeFromId( $mission_card_id );
+        $card = $this->cards->getCardFromId( $card_id );
+        $card_type = $this->cards->getCardTypeFromId( $card_id );
 
         self::notifyAllPlayers(
             'startMission',
             clienttranslate( '${player_name} starts mission for ${mission_name}' ),
             array(
                 'player_name' => $this->getActivePlayerName(),
-                'mission_name' => strtoupper($card_info['name']),
-                'color' => self::getActivePlayerColor(),
-                'card_id' => $card_id,
+                'mission_name' => strtoupper($mission_card_type['name']),
+                'card' => $card,
+                'card_type' => $card_type,
                 'mission_slot' => $mission_slot
             )
         );
@@ -310,15 +363,55 @@ class KompromatEP extends Table
      */
     function stopDrawing()
     {
-        // Handle stop drawing cards
+        $current_mission = self::getGameStateValue( 'current_mission' );
+        self::setGameStateValue( 'current_mission', 0 );
+
+        $cards_on_mission = $this->cards->getPlayerCardsOnMission( $this->getActivePlayerColor(), $current_mission );
+
+        self::notifyAllPlayers(
+            'stopDrawingCards',
+            clienttranslate( '${player_name} stops drawing cards'),
+            array(
+                'player_name' => $this->getActivePlayerName(),
+                'player_color' => $this->getActivePlayerColor(),
+                'current_mission' => $current_mission,
+                'cards' => $cards_on_mission
+            )
+        );
+
+        // Increment completed mission half counter
+        $completed_mission_halves = self::getGameStateValue( 'completed_mission_halves' );
+        $completed_mission_halves++;
+        self::setGameStateValue( 'completed_mission_halves', $completed_mission_halves );
+
+        // Unset private state and move to next player state
+        $this->gamestate->unsetPrivateState( $this->getActivePlayerId() );
+        $this->gamestate->setPlayerNonMultiactive( $this->getActivePlayerId(), 'nextPlayer' );
     }
 
     /**
      * Stop using items
      */
-    function stopUsingItems()
+    function stopUsingItems( $player_id )
     {
-        // Handle stop using items.
+        $next_state = '';
+
+        $current_phase = self::getGameStateValue( 'end_round_phase' );
+
+        if( $current_phase == END_REVEAL )
+        {
+            $next_state = 'revealCards';
+        }
+        if( $current_phase == END_CHOOSE_ACES )
+        {
+            $next_state = 'chooseAces';
+        }
+        if( $current_phase == END_FAILED )
+        {
+            $next_state = 'failedMission';
+        }
+
+        $this->gamestate->setPlayerNonMultiactive( $player_id, $next_state );
     }
 
     /**
@@ -363,6 +456,13 @@ class KompromatEP extends Table
         game state.
     */
 
+    function argsChooseAces()
+    {
+        return array(
+            'mission_slot_to_resolve' => self::getGameStateValue( 'mission_slot_to_resolve' )
+        );
+    }
+
     function argsPlayerTurnFirstCard()
     {
         $player_color = self::getActivePlayerColor();
@@ -374,22 +474,14 @@ class KompromatEP extends Table
         );
     }
 
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
+    function argsPlayerTurnContinueMission()
     {
-        // Get some values from the current game situation in database...
-    
-        // return values:
         return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
+            'current_mission' => self::getGameStateValue( 'current_mission' ),
+            'blue_deck_size' => $this->cards->getDeckCount( 'blue' ),
+            'yellow_deck_size' => $this->cards->getDeckCount( 'yellow' )
         );
-    }    
-    */
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state actions
@@ -419,7 +511,19 @@ class KompromatEP extends Table
 
     function stNextPlayer()
     {
-        // Handle player change
+        // Check if all missions are finished
+        if( self::getGameStateValue( 'completed_mission_halves' ) == 8 )
+        {
+            self::setGameStateValue( 'completed_mission_halves', 0 );
+            self::setGameStateValue( 'mission_slot_to_resolve', 1);
+            $this->gamestate->nextState( 'endTurns' );
+        }
+        else
+        {
+            $player_id = self::activeNextPlayer();
+            self::giveExtraTime( $player_id );
+            $this->gamestate->nextState( 'nextTurn' );
+        }
     }
 
     function stNextRound()
@@ -432,6 +536,20 @@ class KompromatEP extends Table
      */
     function stPlayerTurn()
     {
+        // Put player's first card on deck
+        $new_card = $this->cards->drawPlayerCardFaceupOnDeck( self::getActivePlayerColor() );
+        $card_info = $this->cards->getCardTypeFromId( $new_card['id'] );
+        self::notifyAllPlayers(
+            'drawFaceupCard',
+            clienttranslate( '${player_name} reveals a ${card_name}'),
+            array(
+                'player_name' => $this->getActivePlayerName(),
+                'card_name' => $card_info['name'],
+                'card' => $new_card
+            )
+        );
+
+        // Init multiactive and private states
         $this->gamestate->setPlayersMultiactive([$this->getActivePlayerId()], "");
         $this->gamestate->initializePrivateState($this->getActivePlayerId());
     }
@@ -439,6 +557,43 @@ class KompromatEP extends Table
     function stRevealCards()
     {
         // Handle reveal cards
+        $mission_slot = self::getGameStateValue( 'mission_slot_to_resolve' );
+        $blue_cards = $this->cards->getPlayerCardsOnMission( 'blue', $mission_slot );
+        $yellow_cards = $this->cards->getPlayerCardsOnMission( 'yellow', $mission_slot );
+
+        $mission_cards = $this->cards->getCardsInMissionSlot( $mission_slot );
+        $mission_card_id;
+
+        foreach( $mission_cards as $id => $card )
+        {
+            if( $card['type'] != COUNTERINTELLIGENCE )
+            {
+                $mission_card_id = $id;
+            }
+        }
+
+        $mission_card_type = $this->cards->getCardTypeFromId( $mission_card_id );
+
+        self::notifyAllPlayers(
+            'revealMissionCards',
+            clienttranslate( 'Revealing all cards for mission: ${mission_name} '),
+            array(
+                'mission_name' => strtoupper($mission_card_type['name']),
+                'mission_slot' => $mission_slot,
+                'blue_cards' => $blue_cards,
+                'yellow_cards' => $yellow_cards
+            )
+        );
+
+        self::setGameStateValue( 'end_round_phase', END_CHOOSE_ACES );
+        $this->gamestate->nextState( 'useItems' );
+    }
+
+    function stUseItemsPhaseInit()
+    {
+        // If players have items
+        $this->gamestate->setAllPlayersMultiactive();
+        $this->gamestate->initializePrivateStateForAllActivePlayers();
     }
 
 //////////////////////////////////////////////////////////////////////////////

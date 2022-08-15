@@ -177,7 +177,9 @@
     {
       self::setAjaxMode();
 
-      $this->game->stopUsingItems();
+      $player_id = self::getArg( "playerId", AT_posint, true );
+
+      $this->game->stopUsingItems( $player_id );
 
       self::ajaxResponse();
     }

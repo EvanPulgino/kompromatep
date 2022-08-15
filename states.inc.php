@@ -69,8 +69,8 @@ $machinestates = array(
      */
     PLAYER_TURN => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('Waiting for other player to finish turn.'),
-        "descriptionmyturn" => clienttranslate('${you} must do your turn.'),
+        "description" => clienttranslate('Waiting for other player to finish turn'),
+        "descriptionmyturn" => clienttranslate('${you} must do your turn'),
         "type" => "multipleactiveplayer",
         "initialprivate" => PLAYER_TURN_FIRST_CARD,
         "action" => "stPlayerTurn",
@@ -82,8 +82,8 @@ $machinestates = array(
      */
     PLAYER_TURN_FIRST_CARD => array(
     	"name" => "playerTurnFirstCard",
-    	"description" => clienttranslate('${actplayer} must start a mission with the ${card_name}'),
-    	"descriptionmyturn" => clienttranslate('${you} must start a mission with the ${card_name}'),
+    	"description" => clienttranslate('${actplayer} must start a mission with the ${card_name} or use an item'),
+    	"descriptionmyturn" => clienttranslate('${you} must start a mission with the ${card_name} or use an item'),
     	"type" => "private",
         "args" => "argsPlayerTurnFirstCard",
     	"possibleactions" => array( SELECT_MISSION, USE_ITEM ),
@@ -104,9 +104,10 @@ $machinestates = array(
      */
     PLAYER_TURN_CONTINUE_MISSION => array(
         "name" => "playerTurnContinueMission",
-        "description" => clienttranslate('${actplayer} may draw another card or pass.'),
-        "descriptionmyturn" => clienttranslate('${you} may draw another card or pass.'),
+        "description" => clienttranslate('${actplayer} may draw another card, use an item, or stop'),
+        "descriptionmyturn" => clienttranslate('${you} may draw another card, use an item, or stop'),
         "type" => "private",
+        "args" => "argsPlayerTurnContinueMission",
         "possibleactions" => array( DRAW_CARD, STOP_DRAWING, USE_ITEM ),
         "transitions" => array( 
             "playCards" => PLAYER_TURN_CONTINUE_MISSION,
@@ -126,13 +127,13 @@ $machinestates = array(
     NEXT_PLAYER => array(
         "name" => "nextPlayer",
         "type" => "game",
-        "action" => "stGameNextPlayer",
+        "action" => "stNextPlayer",
         "updateGameProgression" => true,
-        "transitions" => array( "nextTurn" => PLAYER_TURN_FIRST_CARD, "endTurns" => USE_ITEMS_PHASE )
+        "transitions" => array( "nextTurn" => PLAYER_TURN, "endTurns" => USE_ITEMS_PHASE )
     ),
 
     /**
-     * Use items phase before or after revealing cards.
+     * Use items phase in between end round phases
      */
     USE_ITEMS_PHASE => array(
         "name" => "useItemsPhase",
@@ -140,15 +141,15 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} may use items or pass.'),
         "type" => "multipleactiveplayer",
         "initialprivate" => USE_ITEMS,
-        "transitions" => array( "revealCards" => REVEAL_CARDS, "failedMission" => FAILED_MISSION ),
-        "action" => "stMultiPlayerInit"
+        "transitions" => array( "revealCards" => REVEAL_CARDS, "chooseAces" => CHOOSE_ACES, "failedMission" => FAILED_MISSION ),
+        "action" => "stUseItemsPhaseInit"
     ),
 
     /**
      * Use items private state
      */
     USE_ITEMS => array(
-        "name" => "useItem",
+        "name" => "useItems",
         "description" => clienttranslate('Waiting for other players to finish using items.'),
         "descriptionmyturn" => clienttranslate('${you} may use an item or pass.'),
         "type" => "private",
@@ -249,6 +250,20 @@ $machinestates = array(
         "type" => "game",
         "action" => "stRevealCards",
         "transitions" => array( "useItems" => USE_ITEMS_PHASE )
+    ),
+
+    /**
+     * Chose value of aces
+     */
+    CHOOSE_ACES => array(
+        "name" => "chooseAces",
+        "description" => clienttranslate('Waiting for other player to decide value of mission.'),
+        "descriptionmyturn" => clienttranslate('You must decide the value of the mission.'),
+        "type" => "multipleactiveplayer",
+        "args" => "argsChooseAces",
+        "possibleactions" => array( "chooseAces" ),
+        "transitions" => array( "useItems" => USE_ITEMS_PHASE ),
+        "action" => "stMultiPlayerInit"
     ),
 
     /**

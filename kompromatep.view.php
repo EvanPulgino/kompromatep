@@ -44,22 +44,35 @@
 
         $this->page->begin_block( $template, 'playerarea' );
 
+        $this->page->begin_block( $template, 'playermissioncard' );
         $this->page->begin_block( $template, 'playermissionslot' );
         $this->page->begin_block( $template, 'playermission' );
 
         foreach( $players as $player )
         {
-          $this->page->reset_subblocks('playermissionslot');
+          $this->page->reset_subblocks( 'playermissionslot' );
 
           $this->page->insert_block( "playerarea", array(
             'PLAYER_ID' => $player['player_id'],
             'PLAYER_NAME' => $player['player_name'],
             'PLAYER_COLOR' => $this->game->getColorStringFromHex( $player['player_color'] ),
             'ORDER' => $order
-          ) );
+          ) ); 
 
           for( $slot_number = 1; $slot_number <= 4; $slot_number++ )
           {
+            $this->page->reset_subblocks( 'playermissioncard' );
+
+            for( $card_number = 1; $card_number <= 9; $card_number++ )
+            {
+              $this->page->insert_block( "playermissioncard", array(
+                'PLAYER_COLOR' => $this->game->getColorStringFromHex( $player['player_color'] ),
+                'SLOT_NUMBER' => $slot_number,
+                'CARD_NUMBER' => $card_number
+              ) );
+            }
+
+
             $this->page->insert_block( "playermissionslot", array(
               'PLAYER_ID' => $player['player_id'],
               'PLAYER_NAME' => $player['player_name'],

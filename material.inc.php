@@ -19,7 +19,7 @@
  *
  */
 
-require_once( 'modules/constants.inc.php' );
+require_once( 'modules/php/constants.inc.php' );
 
 $this->card_type = array(
   BLUE_ACE => array(
